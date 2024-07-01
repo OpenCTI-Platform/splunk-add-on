@@ -1,0 +1,96 @@
+
+<dashboard version="2" theme="dark">
+    <label>OpenCTI Indicators</label>
+    <description></description>
+    <definition><![CDATA[
+{
+	"visualizations": {
+		"viz_dCBGEBc7": {
+			"type": "splunk.image",
+			"options": {
+				"preserveAspectRatio": true
+			}
+		},
+		"viz_JYABKy8F": {
+			"type": "splunk.singlevalue",
+			"dataSources": {
+				"primary": "ds_PYxsaacd"
+			},
+			"title": "OpenCTI Indicators Count"
+		}
+	},
+	"dataSources": {
+		"ds_PYxsaacd": {
+			"type": "ds.search",
+			"options": {
+				"query": "| inputlookup opencti_lookup | stats count"
+			},
+			"name": "OpenCTI Indicators Count"
+		}
+	},
+	"defaults": {
+		"dataSources": {
+			"ds.search": {
+				"options": {
+					"queryParameters": {
+						"latest": "$global_time.latest$",
+						"earliest": "$global_time.earliest$"
+					}
+				}
+			}
+		}
+	},
+	"inputs": {
+		"input_global_trp": {
+			"type": "input.timerange",
+			"options": {
+				"token": "global_time",
+				"defaultValue": "-24h@h,now"
+			},
+			"title": "Période globale"
+		}
+	},
+	"layout": {
+		"type": "absolute",
+		"options": {
+			"width": 1440,
+			"height": 960
+		},
+		"structure": [
+			{
+				"item": "viz_dCBGEBc7",
+				"type": "block",
+				"position": {
+					"x": 0,
+					"y": 0,
+					"w": 300,
+					"h": 300
+				}
+			},
+			{
+				"item": "viz_JYABKy8F",
+				"type": "block",
+				"position": {
+					"x": 300,
+					"y": 0,
+					"w": 250,
+					"h": 250
+				}
+			}
+		],
+		"globalInputs": [
+			"input_global_trp"
+		]
+	},
+	"description": "",
+	"title": "OpenCTI Indicators"
+}
+    ]]></definition>
+    <meta type="hiddenElements"><![CDATA[
+{
+	"hideEdit": false,
+	"hideOpenInSearch": false,
+	"hideExport": false
+}
+    ]]></meta>
+</dashboard>

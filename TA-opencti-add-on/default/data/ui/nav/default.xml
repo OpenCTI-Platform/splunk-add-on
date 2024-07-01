@@ -1,0 +1,10 @@
+<nav search_view="search" color="#297ba5">
+<view name="inputs"/>
+<view name="configuration"/>
+<view name="search" label="Search"/>
+<view name="alerts" label="Alerts"/>
+<collection label="Dashboards">
+    <view name="indicators_dashboard" default="true"/>
+</collection>
+
+</nav>

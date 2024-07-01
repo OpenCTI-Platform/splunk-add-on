@@ -1,0 +1,59 @@
+{
+  "schemaVersion": "2.0.0",
+  "info": {
+    "title": "OpenCTI Add-on",
+    "id": {
+      "group": null,
+      "name": "TA-opencti-add-on",
+      "version": "1.0.0"
+    },
+    "author": [
+      {
+        "name": "Filigran",
+        "email": null,
+        "company": null
+      }
+    ],
+    "releaseDate": null,
+    "description": "",
+    "classification": {
+      "intendedAudience": null,
+      "categories": [],
+      "developmentStatus": null
+    },
+    "commonInformationModels": null,
+    "license": {
+      "name": null,
+      "text": null,
+      "uri": null
+    },
+    "privacyPolicy": {
+      "name": null,
+      "text": null,
+      "uri": null
+    },
+    "releaseNotes": {
+      "name": null,
+      "text": null,
+      "uri": null
+    }
+  },
+  "dependencies": {
+  },
+  "tasks": [],
+  "inputGroups": {
+  },
+  "incompatibleApps": {
+  },
+  "platformRequirements": {
+    "splunk": {
+      "Enterprise": "*"
+    }
+  },
+  "supportedDeployments": [
+    "*"
+  ],
+  "targetWorkloads": [
+    "*"
+  ]
+}

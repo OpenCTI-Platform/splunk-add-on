@@ -1,0 +1,724 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "TA-opencti-add-on",
+        "version": "1.0.0",
+        "description": "OpenCTI Add-on",
+        "contact": {
+            "name": "Filigran"
+        }
+    },
+    "servers": [
+        {
+            "url": "https://{domain}:{port}/servicesNS/-/TA-opencti-add-on",
+            "variables": {
+                "domain": {
+                    "default": "localhost"
+                },
+                "port": {
+                    "default": "8089"
+                }
+            },
+            "description": "Access via management interface"
+        }
+    ],
+    "components": {
+        "schemas": {
+            "proxy": {
+                "type": "object",
+                "properties": {
+                    "proxy_enabled": {
+                        "type": "string"
+                    },
+                    "proxy_type": {
+                        "type": "string",
+                        "enum": [
+                            "http",
+                            "socks4",
+                            "socks5"
+                        ]
+                    },
+                    "proxy_url": {
+                        "type": "string"
+                    },
+                    "proxy_port": {
+                        "type": "string"
+                    },
+                    "proxy_username": {
+                        "type": "string"
+                    },
+                    "proxy_password": {
+                        "type": "string",
+                        "format": "password"
+                    },
+                    "proxy_rdns": {
+                        "type": "string"
+                    }
+                }
+            },
+            "proxy_without_name": {
+                "type": "object",
+                "properties": {
+                    "proxy_enabled": {
+                        "type": "string"
+                    },
+                    "proxy_type": {
+                        "type": "string",
+                        "enum": [
+                            "http",
+                            "socks4",
+                            "socks5"
+                        ]
+                    },
+                    "proxy_url": {
+                        "type": "string"
+                    },
+                    "proxy_port": {
+                        "type": "string"
+                    },
+                    "proxy_username": {
+                        "type": "string"
+                    },
+                    "proxy_password": {
+                        "type": "string",
+                        "format": "password"
+                    },
+                    "proxy_rdns": {
+                        "type": "string"
+                    }
+                }
+            },
+            "logging": {
+                "type": "object",
+                "properties": {
+                    "loglevel": {
+                        "type": "string",
+                        "enum": [
+                            "DEBUG",
+                            "INFO",
+                            "WARNING",
+                            "ERROR",
+                            "CRITICAL"
+                        ]
+                    }
+                }
+            },
+            "logging_without_name": {
+                "type": "object",
+                "properties": {
+                    "loglevel": {
+                        "type": "string",
+                        "enum": [
+                            "DEBUG",
+                            "INFO",
+                            "WARNING",
+                            "ERROR",
+                            "CRITICAL"
+                        ]
+                    }
+                }
+            },
+            "additional_parameters": {
+                "type": "object",
+                "properties": {
+                    "opencti_url": {
+                        "type": "string"
+                    },
+                    "opencti_api_key": {
+                        "type": "string",
+                        "format": "password"
+                    },
+                    "disable_ssl_verification": {
+                        "type": "string"
+                    }
+                }
+            },
+            "additional_parameters_without_name": {
+                "type": "object",
+                "properties": {
+                    "opencti_url": {
+                        "type": "string"
+                    },
+                    "opencti_api_key": {
+                        "type": "string",
+                        "format": "password"
+                    },
+                    "disable_ssl_verification": {
+                        "type": "string"
+                    }
+                }
+            },
+            "opencti_indicators": {
+                "type": "object",
+                "properties": {
+                    "name": {
+                        "type": "string"
+                    },
+                    "interval": {
+                        "type": "string"
+                    },
+                    "index": {
+                        "type": "string"
+                    },
+                    "stream_id": {
+                        "type": "string"
+                    },
+                    "disabled": {
+                        "type": "string",
+                        "enum": [
+                            "False",
+                            "True"
+                        ]
+                    }
+                }
+            },
+            "opencti_indicators_without_name": {
+                "type": "object",
+                "properties": {
+                    "interval": {
+                        "type": "string"
+                    },
+                    "index": {
+                        "type": "string"
+                    },
+                    "stream_id": {
+                        "type": "string"
+                    },
+                    "disabled": {
+                        "type": "string",
+                        "enum": [
+                            "False",
+                            "True"
+                        ]
+                    }
+                }
+            },
+            "opencti_indicators_without_disabled": {
+                "type": "object",
+                "properties": {
+                    "name": {
+                        "type": "string"
+                    },
+                    "interval": {
+                        "type": "string"
+                    },
+                    "index": {
+                        "type": "string"
+                    },
+                    "stream_id": {
+                        "type": "string"
+                    }
+                }
+            }
+        },
+        "securitySchemes": {
+            "BasicAuth": {
+                "type": "http",
+                "scheme": "basic"
+            }
+        }
+    },
+    "paths": {
+        "/TA_opencti_add_on_settings/proxy": {
+            "get": {
+                "responses": {
+                    "200": {
+                        "description": "Get list of items for proxy",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "entry": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "name": {
+                                                        "type": "string"
+                                                    },
+                                                    "content": {
+                                                        "$ref": "#/components/schemas/proxy_without_name"
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "description": "Get list of items for proxy",
+                "deprecated": false
+            },
+            "post": {
+                "responses": {
+                    "200": {
+                        "description": "Create item in proxy",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "entry": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "name": {
+                                                        "type": "string"
+                                                    },
+                                                    "content": {
+                                                        "$ref": "#/components/schemas/proxy_without_name"
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "description": "Create item in proxy",
+                "requestBody": {
+                    "content": {
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "$ref": "#/components/schemas/proxy"
+                            }
+                        }
+                    },
+                    "required": false
+                },
+                "deprecated": false
+            },
+            "parameters": [
+                {
+                    "name": "output_mode",
+                    "in": "query",
+                    "required": true,
+                    "description": "Output mode",
+                    "schema": {
+                        "type": "string",
+                        "enum": [
+                            "json"
+                        ],
+                        "default": "json"
+                    }
+                }
+            ]
+        },
+        "/TA_opencti_add_on_settings/logging": {
+            "get": {
+                "responses": {
+                    "200": {
+                        "description": "Get list of items for logging",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "entry": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "name": {
+                                                        "type": "string"
+                                                    },
+                                                    "content": {
+                                                        "$ref": "#/components/schemas/logging_without_name"
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "description": "Get list of items for logging",
+                "deprecated": false
+            },
+            "post": {
+                "responses": {
+                    "200": {
+                        "description": "Create item in logging",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "entry": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "name": {
+                                                        "type": "string"
+                                                    },
+                                                    "content": {
+                                                        "$ref": "#/components/schemas/logging_without_name"
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "description": "Create item in logging",
+                "requestBody": {
+                    "content": {
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "$ref": "#/components/schemas/logging"
+                            }
+                        }
+                    },
+                    "required": false
+                },
+                "deprecated": false
+            },
+            "parameters": [
+                {
+                    "name": "output_mode",
+                    "in": "query",
+                    "required": true,
+                    "description": "Output mode",
+                    "schema": {
+                        "type": "string",
+                        "enum": [
+                            "json"
+                        ],
+                        "default": "json"
+                    }
+                }
+            ]
+        },
+        "/TA_opencti_add_on_settings/additional_parameters": {
+            "get": {
+                "responses": {
+                    "200": {
+                        "description": "Get list of items for additional_parameters",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "entry": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "name": {
+                                                        "type": "string"
+                                                    },
+                                                    "content": {
+                                                        "$ref": "#/components/schemas/additional_parameters_without_name"
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "description": "Get list of items for additional_parameters",
+                "deprecated": false
+            },
+            "post": {
+                "responses": {
+                    "200": {
+                        "description": "Create item in additional_parameters",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "entry": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "name": {
+                                                        "type": "string"
+                                                    },
+                                                    "content": {
+                                                        "$ref": "#/components/schemas/additional_parameters_without_name"
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "description": "Create item in additional_parameters",
+                "requestBody": {
+                    "content": {
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "$ref": "#/components/schemas/additional_parameters"
+                            }
+                        }
+                    },
+                    "required": false
+                },
+                "deprecated": false
+            },
+            "parameters": [
+                {
+                    "name": "output_mode",
+                    "in": "query",
+                    "required": true,
+                    "description": "Output mode",
+                    "schema": {
+                        "type": "string",
+                        "enum": [
+                            "json"
+                        ],
+                        "default": "json"
+                    }
+                }
+            ]
+        },
+        "/TA_opencti_add_on_opencti_indicators": {
+            "get": {
+                "responses": {
+                    "200": {
+                        "description": "Get list of items for opencti_indicators",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "entry": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "name": {
+                                                        "type": "string"
+                                                    },
+                                                    "content": {
+                                                        "$ref": "#/components/schemas/opencti_indicators_without_name"
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "description": "Get list of items for opencti_indicators",
+                "deprecated": false
+            },
+            "post": {
+                "responses": {
+                    "200": {
+                        "description": "Create item in opencti_indicators",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "entry": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "name": {
+                                                        "type": "string"
+                                                    },
+                                                    "content": {
+                                                        "$ref": "#/components/schemas/opencti_indicators_without_name"
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "description": "Create item in opencti_indicators",
+                "requestBody": {
+                    "content": {
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "$ref": "#/components/schemas/opencti_indicators_without_disabled"
+                            }
+                        }
+                    },
+                    "required": false
+                },
+                "deprecated": false
+            },
+            "parameters": [
+                {
+                    "name": "output_mode",
+                    "in": "query",
+                    "required": true,
+                    "description": "Output mode",
+                    "schema": {
+                        "type": "string",
+                        "enum": [
+                            "json"
+                        ],
+                        "default": "json"
+                    }
+                }
+            ]
+        },
+        "/TA_opencti_add_on_opencti_indicators/{name}": {
+            "get": {
+                "responses": {
+                    "200": {
+                        "description": "Get opencti_indicators item details",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "entry": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "name": {
+                                                        "type": "string"
+                                                    },
+                                                    "content": {
+                                                        "$ref": "#/components/schemas/opencti_indicators_without_name"
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "description": "Get opencti_indicators item details",
+                "deprecated": false
+            },
+            "post": {
+                "responses": {
+                    "200": {
+                        "description": "Update opencti_indicators item",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "entry": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "name": {
+                                                        "type": "string"
+                                                    },
+                                                    "content": {
+                                                        "$ref": "#/components/schemas/opencti_indicators_without_name"
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "description": "Update opencti_indicators item",
+                "requestBody": {
+                    "content": {
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "$ref": "#/components/schemas/opencti_indicators_without_name"
+                            }
+                        }
+                    },
+                    "required": false
+                },
+                "deprecated": false
+            },
+            "delete": {
+                "responses": {
+                    "200": {
+                        "description": "Delete opencti_indicators item",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "entry": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "name": {
+                                                        "type": "string"
+                                                    },
+                                                    "content": {
+                                                        "$ref": "#/components/schemas/opencti_indicators_without_name"
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "description": "Delete opencti_indicators item",
+                "deprecated": false
+            },
+            "parameters": [
+                {
+                    "name": "name",
+                    "in": "path",
+                    "required": true,
+                    "description": "The name of the item to operate on",
+                    "schema": {
+                        "type": "string"
+                    }
+                },
+                {
+                    "name": "output_mode",
+                    "in": "query",
+                    "required": true,
+                    "description": "Output mode",
+                    "schema": {
+                        "type": "string",
+                        "enum": [
+                            "json"
+                        ],
+                        "default": "json"
+                    }
+                }
+            ]
+        }
+    },
+    "security": [
+        {
+            "BasicAuth": []
+        }
+    ]
+}
