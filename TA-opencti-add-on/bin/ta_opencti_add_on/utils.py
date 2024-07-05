@@ -1,5 +1,6 @@
 import ipaddress
 import stix2
+import re
 
 def is_ipv6(ip_str):
     """Determine whether the provided string is an IPv6 address or valid IPv6 CIDR."""
@@ -37,8 +38,8 @@ def get_marking_id(value):
     if value == "tlp_red":
         return stix2.TLP_RED
 
-
 def extract_observables_from_cim_model(event):
+
     observables = []
     if "url" in event:
         observables.append({"type": "url", "value": event.get("url")})
@@ -56,5 +57,4 @@ def extract_observables_from_cim_model(event):
             observables.append({"type": "ipv4", "value": event.get("src_ip")})
         if is_ipv6(event.get("src_ip")):
             observables.append({"type": "ipv6", "value": event.get("src_ip")})
-
     return observables

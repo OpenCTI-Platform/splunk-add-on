@@ -1,10 +1,17 @@
 # encoding = utf-8
 import json
-from pycti import OpenCTIApiClient
 from datetime import datetime
 from utils import get_marking_id, extract_observables_from_cim_model
+from common import process_labels, init_octi_client
 
 def create_incident_response(helper, event):
+
+    if helper.get_param("labels") == '':
+        labels = []
+    else:
+        labels = [x.strip() for x in helper.get_param("labels").split(',')]
+    # remove potential empty labels
+    labels = list(filter(None, labels))
 
     alert_params = {
         "name": helper.get_param("name"),
@@ -12,28 +19,27 @@ def create_incident_response(helper, event):
         "type": helper.get_param("type"),
         "severity": helper.get_param("severity"),
         "priority": helper.get_param("priority"),
-        "labels": helper.get_param("labels"),
+        "labels": labels,
         "tlp": helper.get_param("tlp"),
         "date": datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ")
     }
 
-    helper.log_info("Alert params={}".format(alert_params))
+    helper.log_debug("Alert params={}".format(alert_params))
 
     try:
-        # load opencti global configuration
-        opencti_url = helper.get_global_setting("opencti_url")
-        opencti_api_key = helper.get_global_setting("opencti_api_key")
+        # OpenCTI client initialization
+        opencti_api_client = init_octi_client(helper)
 
-        # OpenCTI initialization
-        opencti_api_client = OpenCTIApiClient(opencti_url, opencti_api_key)
+        # process labels creation
+        process_labels(opencti_api_client, alert_params.get("labels"))
 
-        # Create the identity
+        # create the identity
         identity = opencti_api_client.identity.create(
             type="System",
             name=event.get("host")
         )
 
-        # Create the incident response case
+        # create the incident response case
         incident = opencti_api_client.case_incident.create(
             name=alert_params.get("name"),
             description=event.get("_raw"),
@@ -48,7 +54,7 @@ def create_incident_response(helper, event):
             createdBy=identity["id"]
         )
 
-        # Extract observables from _raw alert
+        # extract observables from _raw alert
         observables = extract_observables_from_cim_model(event)
         observable_refs = []
 
@@ -92,7 +98,7 @@ def create_incident_response(helper, event):
                 stixObjectOrStixRelationshipId=observable_ref
             )
 
-        helper.log_info("Incident successfully created")
+        helper.log_info("Incident response case successfully created")
     except Exception as ex:
         helper.log_info(ex)
 
@@ -152,17 +158,16 @@ def process_event(helper, *args, **kwargs):
     """
 
     # Set the current LOG level
-    helper.log_info(helper.log_level)
     helper.set_log_level(helper.log_level)
 
     helper.log_info("Alert action create_incident_response started.")
 
-    helper.log_info("args={}".format(args))
-    helper.log_info("kwargs={}".format(kwargs))
+    # helper.log_info("args={}".format(args))
+    # helper.log_info("kwargs={}".format(kwargs))
 
     events = helper.get_events()
     for event in events:
-        helper.log_info("event={}".format(json.dumps(event)))
+        helper.log_debug("event={}".format(json.dumps(event)))
         create_incident_response(helper, event)
 
     return 0
