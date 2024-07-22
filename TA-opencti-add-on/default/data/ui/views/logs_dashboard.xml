@@ -1,0 +1,37 @@
+<form version="1.1" theme="light">
+    <label>App Logs</label>
+    <fieldset submitButton="true" autoRun="false">
+        <input type="time" token="time_range">
+            <label>Time Range</label>
+            <default>
+                <earliest>-15m</earliest>
+                <latest>now</latest>
+            </default>
+        </input>
+    </fieldset>
+    <row>
+        <panel>
+            <title>App Logs</title>
+            <table>
+                <search>
+                    <query>index=_internal sourcetype="taopenctiaddon:log" search *
+                        | eval time=strftime(_time, "%F %T")
+                        | eval message=coalesce(event_message, _raw)
+                        | table time sourcetype log_level message
+                        | sort - time
+                        | rename log_level as Level, time as Time, message as Message, sourcetype as "Sourcetype"</query>
+                    <earliest>$time_range.earliest$</earliest>
+                    <latest>$time_range.latest$</latest>
+                    <sampleRatio>1</sampleRatio>
+                </search>
+                <option name="count">100</option>
+                <option name="dataOverlayMode">none</option>
+                <option name="drilldown">none</option>
+                <option name="percentagesRow">false</option>
+                <option name="rowNumbers">false</option>
+                <option name="totalsRow">false</option>
+                <option name="wrap">true</option>
+            </table>
+        </panel>
+    </row>
+</form>
