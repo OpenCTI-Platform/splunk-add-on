@@ -18,6 +18,9 @@ def process_event(helper, *args, **kwargs):
     tlp = helper.get_param("tlp")
     helper.log_info("tlp={}".format(tlp))
 
+    observables_extraction = helper.get_param("observables_extraction")
+    helper.log_info("observables_extraction={}".format(observables_extraction))
+
 
     # The following example adds two sample events ("hello", "world")
     # and writes them to Splunk
@@ -38,7 +41,7 @@ def process_event(helper, *args, **kwargs):
     [sample_code_macro:end]
     """
 
-    helper.log_info("Alert action create_sighting started.")
+    helper.log_info("Alert action create_sighting not implemented.")
 
     # TODO: Implement your alert action logic here
     return 0
