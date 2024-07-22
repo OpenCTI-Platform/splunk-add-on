@@ -1,11 +1,6 @@
 
 
-[create_sighting]
-python.version = python3
-param.labels = <string> Labels.
-param.tlp = <list> TLP.  It's default value is tlp_amber.
-
-[create_incident]
+[opencti_create_incident]
 python.version = python3
 param.name = <string> Name. It's a required parameter. It's default value is $name$.
 param.description = <string> Description.  It's default value is $description$.
@@ -13,8 +8,9 @@ param.type = <string> Type.
 param.severity = <list> Severity. It's default value is medium.
 param.labels = <string> Labels.
 param.tlp = <list> TLP.  It's default value is tlp_amber.
+param.observables_extraction = <list> Observables extraction. It's default value is disable.
 
-[create_incident_response]
+[opencti_create_incident_response]
 python.version = python3
 param.name = <string> Name. It's a required parameter. It's default value is $name$.
 param.description = <string> Description.  It's default value is $description$.
@@ -24,4 +20,5 @@ param.type = <string> Type.
 param.case_template = <string> Case Template.
 param.labels = <string> Labels.
 param.tlp = <list> TLP.  It's default value is tlp_amber.
+param.observables_extraction = <list> Observables extraction. It's default value is disable.
 

@@ -3,8 +3,6 @@
 <view name="configuration"/>
 <view name="search" label="Search"/>
 <view name="alerts" label="Alerts"/>
-<collection label="Dashboards">
-    <view name="indicators_dashboard" default="true"/>
-</collection>
-
+<view name="indicators_dashboard" label="Indicators Dashboard" default="true"/>
+<!--<view name="logs_dashboard" label="App Logs"/>-->
 </nav>

@@ -1,9 +1,13 @@
 # encoding = utf-8
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 import json
 import splunklib.client as client
 from filigran_sseclient import SSEClient
 import time
+from stix2patterns.v21.pattern import Pattern
+import six
+from ta_opencti_add_on.common import get_proxy_config
+import sys
 
 '''
     IMPORTANT
@@ -16,6 +20,34 @@ import time
 def use_single_instance_mode():
     return True
 '''
+
+SUPPORTED_TYPES = {
+    "email-addr": {"value": "email-addr"},
+    "email-message": {"value": "email-message"},
+    "ipv4-addr": {"value": "ipv4-addr"},
+    "ipv6-addr": {"value": "ipv6-addr"},
+    "domain-name": {"value": "domain-name"},
+    "hostname": {"value": "hostname"},
+    "url": {"value": "url"},
+    "user-agent": {"value": "user-agent"},
+    "file": {"hashes.MD5": "md5", "hashes.SHA-1": "sha1", "hashes.SHA-256": "sha256", "name": "filename"},
+}
+
+MARKING_DEFs = {}
+
+IDENTITY_DEFs = {}
+
+def date_now_z():
+    """get the current date (UTC)
+    :return: current datetime for utc
+    :rtype: str
+    """
+    return (
+        datetime.utcnow()
+        .replace(microsecond=0, tzinfo=timezone.utc)
+        .isoformat()
+        .replace("+00:00", "Z")
+    )
 
 def validate_input(helper, definition):
     """Implement your own validation logic to validate the input stanza configurations"""
@@ -47,63 +79,50 @@ def sanitize_key(key):
     """
     return key.replace(".", ":").replace("'", "")
 
+def parse_stix_pattern(stix_pattern):
+    parsed_pattern = Pattern(stix_pattern)
+    for observable_type, comparisons in six.iteritems(
+            parsed_pattern.inspect().comparisons
+    ):
+        for obj_path, obj_operator, obj_value in comparisons:
+            if observable_type in SUPPORTED_TYPES:
+                obj_path = ".".join(obj_path)
+                if obj_path in SUPPORTED_TYPES[observable_type]:
+                    if obj_operator == "=":
+                        return {
+                            "type": SUPPORTED_TYPES[observable_type][obj_path],
+                            "value": obj_value.strip("'")
+                        }
+
 def enrich_payload(splunk_helper, payload):
 
     # add stream id and input name #TODO: check if it's usefull
     payload["stream_id"] = splunk_helper.get_arg('stream_id')
     payload["input_name"] = splunk_helper.get_input_stanza_names()
 
-    """
-    if "type" in payload:
-        if (payload["type"] == "indicator" and
-                payload["pattern_type"].startswith("stix")):
+    # parse created_by
+    created_by_id = payload.get("created_by_ref", None)
+    if created_by_id is not None:
+        org_name = IDENTITY_DEFs.get(created_by_id, None)
+        if org_name is not None:
+            payload["created_by"] = org_name
 
-            translation = stix_translation.StixTranslation()
-            # add splunk query
-            try:
-                response = translation.translate(
-                    "splunk", "query", "{}", payload["pattern"]
-                )
-                payload["splunk_queries"] = response
-            except:
-                pass
+    # parse marking_refs
+    for marking_ref_id in payload.get("object_marking_refs", []):
+        payload["markings"] = []
+        if marking_ref_id is not None:
+            marking_value = MARKING_DEFs.get(marking_ref_id, None)
+            if marking_value is not None:
+                payload["markings"].append(marking_value)
 
-            # add mapped values
-            try:
-                parsed = translation.translate(
-                    "splunk", "parse", "{}", payload["pattern"]
-                )
-                if "parsed_stix" in parsed and len(parsed["parsed_stix"]) > 0:
-                    payload["mapped_values"] = []
-                    for value in parsed["parsed_stix"]:
-                        formatted_value = {}
-                        formatted_value[sanitize_key(value["attribute"])] = value[
-                            "value"
-                        ]
-                        payload["mapped_values"].append(formatted_value)
-                else:
-                    raise ValueError("Not parsed")
-            except:
-                try:
-                    splitted = payload["pattern"].split(" = ")
-                    key = sanitize_key(splitted[0].replace("[", ""))
-                    value = splitted[1].replace("'", "").replace("]", "")
-                    formatted_value = {}
-                    formatted_value[key] = value
-                    payload["mapped_values"] = [formatted_value]
-                except:
-                    payload["mapped_values"] = []
+    # parse stix pattern
+    parsed_stix = parse_stix_pattern(payload['pattern'])
+    if parsed_stix is None:
+        return None
+    payload["type"] = parsed_stix["type"]
+    payload["value"] = parsed_stix["value"]
+    payload["value"] = parsed_stix["value"]
 
-            # add values
-            payload["values"] = sum(
-                [list(value.values()) for value in payload["mapped_values"]], []
-            )
-        created_by = payload.get("created_by_ref", None)
-        if created_by is not None:
-            org_name = self.get_org_name(created_by)
-            if org_name is not None:
-                payload["created_by"] = org_name
-    """
     if "extensions" in payload:
         for extension_definition in payload["extensions"].values():
             for attribute_name in [
@@ -123,6 +142,11 @@ def enrich_payload(splunk_helper, payload):
                         payload[attribute_name] = attribute_value
         # remove extensions
         del payload["extensions"]
+
+    # remove external_references
+    if "external_references" in payload:
+        del payload["external_references"]
+
     return payload
 
 
@@ -204,10 +228,9 @@ def collect_events(helper, ew):
     """
 
     # set loglevel
-    loglevel = helper.get_log_level()
-    helper.set_log_level(loglevel)
+    helper.set_log_level(helper.log_level)
 
-    helper.log_info("OpenCTI data input module")
+    helper.log_info("OpenCTI data input module start")
     input_name = helper.get_input_stanza_names()
 
     # connect to splunk
@@ -215,9 +238,10 @@ def collect_events(helper, ew):
     try:
         splunk = client.connect(token=helper.context_meta['session_key'], owner="nobody", app="TA-opencti-add-on")
     except Exception as ex:
-        helper.log(f"An exception occurred while connecting to splunk: {ex}")
+        helper.log_error(f"an exception occurred while connecting to splunk: {ex}")
 
     if splunk is None:
+        helper.log_error(f"Unable to initialize connection with Splunk, Splunk client is None")
         raise Exception("Unable to initialize connection with Splunk, Splunk client is None")
 
     # manage kvstore
@@ -229,7 +253,8 @@ def collect_events(helper, ew):
         helper.log_info(f"An exception occurred while creating kv_store, {ex}")
 
     # get proxy setting configuration
-    proxy_settings = helper.get_proxy()  #TODO: to take into account
+    proxies = get_proxy_config(helper)
+    helper.log_debug(f"proxy configuration: {proxies}")
 
     # get connection configuration
     opencti_url = helper.get_global_setting("opencti_url")
@@ -241,60 +266,81 @@ def collect_events(helper, ew):
     helper.log_debug(f"Verify SSL: {verif_ssl}")
 
     stream_id = helper.get_arg('stream_id')
-    helper.log_info(f"Going to fetch data of OCTI stream.id: {stream_id}")
+    helper.log_info(f"going to fetch data of OpenCTI stream.id: {stream_id}")
 
     # load kvstore
     kv_store = splunk.kvstore[indicators_kvstore].data
 
-    # get last_id stream
-    last_id = helper.get_check_point(input_name) or "0-0"
-    helper.log_info(f"last_id: {last_id}")
+    # get stream state
+    state = helper.get_check_point(input_name)
+    helper.log_info(f"checkpoint State: {state}")
+    if state is None:
+        helper.log_info("No state, going to initialize it")
+        import_from = helper.get_arg('import_from')
+        start_date = datetime.utcnow().replace(microsecond=0) - timedelta(days=int(import_from))
+        start_date_timestamp = int(datetime.timestamp(start_date))
+        state = {"start_from": str(start_date_timestamp)}
+        helper.log_info(f"Initialized state: {state}")
+    else:
+        state = json.loads(state)
+        helper.log_info(f"State: {state}")
+
+    if "recover_until" in state:
+        live_stream_url = opencti_url+"/stream/"+stream_id+ "?recover=" + state.get("recover_until")
+    else:
+        live_stream_url = opencti_url+"/stream/"+stream_id
 
     # consume OCTI stream
-    url = opencti_url+"/stream/"+stream_id
     try:
         messages = SSEClient(
-            url,
-            last_id,
+            live_stream_url,
+            state.get("start_from"),
             headers={
                 "authorization": "Bearer "+opencti_api_key,
                 "listen-delete": "true",
                 "no-dependencies": "true",
                 "with-inferences": "true",
             },
-            verify=True
+            verify=True,
+            proxies=proxies
         )
+
+        for msg in messages:
+            if msg.event in ["create", "update", "delete"]:
+                data = json.loads(msg.data)["data"]
+                if data['type'] == "indicator" and data['pattern_type'] == "stix":
+                    parsed_stix = enrich_payload(helper, data)
+                    if parsed_stix is None:
+                        helper.log_error(f"Unable to process indicator: {data['name']} - {data['pattern']}")
+                        continue
+                    helper.log_info("processing msg: "+ msg.event +" - "+ msg.id +" - "+parsed_stix['name']+" - "+parsed_stix['pattern'])
+                    if msg.event == "create" or msg.event == "update":
+                        exist = exist_in_kvstore(kv_store, parsed_stix["_key"])
+                        if exist:
+                            kv_store.update(parsed_stix["_key"], parsed_stix)
+                        else:
+                            parsed_stix['added_at'] = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+                            kv_store.insert(parsed_stix)
+                    if msg.event == "delete":
+                        exist = exist_in_kvstore(kv_store, parsed_stix["_key"])
+                        if exist:
+                            kv_store.delete_by_id(parsed_stix["_key"])
+
+                if data['type'] == "marking-definition":
+                    helper.log_info("processing msg: "+ msg.event +" - "+ msg.id +" - "+data['name']+" - "+data['id'])
+                    if msg.event == "create" or msg.event == "update":
+                        if data['id'] not in MARKING_DEFs:
+                            MARKING_DEFs[data['id']] = data['name']
+
+                if data['type'] == "identity":
+                    helper.log_info("processing msg: "+ msg.event +" - "+ msg.id +" - "+data['name']+" - "+data['id'])
+                    if msg.event == "create" or msg.event == "update":
+                        if data['id'] not in IDENTITY_DEFs:
+                            IDENTITY_DEFs[data['id']] = data['name']
+
+                # update checkpoint (take 0:00:00.005544 to update)
+                state["start_from"] = msg.id
+                helper.save_check_point(input_name, json.dumps(state))
     except Exception as ex:
-        helper.log_error("An exception occurred while connecting to stream API, check your settings")
-        helper.log_error(ex)
-        return
-
-    for msg in messages:
-        start_time_update_checkpoint = time.time()
-        helper.save_check_point(input_name, msg.id)
-        helper.log_info("update check point --- %s seconds ---" % (time.time() - start_time_update_checkpoint))
-        if msg.event in ["create", "update", "delete"]:
-            data = json.loads(msg.data)["data"]
-            if data['type'] == "indicator":
-                indicator = enrich_payload(helper, data)
-                helper.log_info(msg.event +" - "+ msg.id +" - "+indicator['name']+" - "+indicator['pattern'])
-                if msg.event == "create" or msg.event == "update":
-                    start_time_check_kvstore = time.time()
-                    exist = exist_in_kvstore(kv_store, indicator["_key"])
-                    helper.log_info("check kvstore --- %s seconds ---" % (time.time() - start_time_check_kvstore))
-                    if exist:
-                        start_time_update_kvstore = time.time()
-                        kv_store.update(indicator["_key"], indicator)
-                        helper.log_info("update kvstore --- %s seconds ---" % (time.time() - start_time_update_kvstore))
-                    else:
-                        indicator['added_at'] = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
-                        start_time_insert_kvstore = time.time()
-                        kv_store.insert(indicator)
-                        helper.log_info("insert kvstore --- %s seconds ---" % (time.time() - start_time_insert_kvstore))
-                if msg.event == "delete":
-                    exist = exist_in_kvstore(kv_store, indicator["_key"])
-                    if exist:
-                        start_time_delete_kvstore = time.time()
-                        kv_store.delete_by_id(indicator["_key"])
-                        helper.log_info("delete kvstore --- %s seconds ---" % (time.time() - start_time_delete_kvstore))
-
+        helper.log_error(f"Error in ListenStream loop, exit, reason: {ex}")
+        sys.excepthook(*sys.exc_info())

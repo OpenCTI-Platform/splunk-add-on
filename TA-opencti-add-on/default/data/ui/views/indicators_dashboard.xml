@@ -1,22 +1,248 @@
 
 <dashboard version="2" theme="dark">
-    <label>OpenCTI Indicators</label>
+    <label>Indicators Dashboard</label>
     <description></description>
     <definition><![CDATA[
 {
 	"visualizations": {
-		"viz_dCBGEBc7": {
-			"type": "splunk.image",
-			"options": {
-				"preserveAspectRatio": true
-			}
-		},
 		"viz_JYABKy8F": {
 			"type": "splunk.singlevalue",
 			"dataSources": {
 				"primary": "ds_PYxsaacd"
 			},
-			"title": "OpenCTI Indicators Count"
+			"title": "Total Indicators"
+		},
+		"viz_Fd89pVRP": {
+			"type": "splunk.line",
+			"dataSources": {
+				"primary": "ds_YI12Xgn7"
+			},
+			"title": "Indicators over time",
+			"options": {
+				"seriesColors": [
+					"#009CEB",
+					"#00CDAF",
+					"#DD9900",
+					"#FF677B",
+					"#CB2196",
+					"#813193",
+					"#0051B5",
+					"#008C80",
+					"#99B100",
+					"#FFA476",
+					"#FF6ACE",
+					"#AE8CFF",
+					"#00689D",
+					"#00490A",
+					"#465D00",
+					"#9D6300",
+					"#F6540B",
+					"#FF969E",
+					"#E47BFE"
+				]
+			}
+		},
+		"viz_j5FlJLaK": {
+			"type": "splunk.pie",
+			"dataSources": {
+				"primary": "ds_hsDs3Q0C"
+			},
+			"title": "Indicators types",
+			"options": {
+				"seriesColors": [
+					"#009CEB",
+					"#00CDAF",
+					"#DD9900",
+					"#FF677B",
+					"#CB2196",
+					"#813193",
+					"#0051B5",
+					"#008C80",
+					"#99B100",
+					"#FFA476",
+					"#FF6ACE",
+					"#AE8CFF",
+					"#00689D",
+					"#00490A",
+					"#465D00",
+					"#9D6300",
+					"#F6540B",
+					"#FF969E",
+					"#E47BFE"
+				]
+			}
+		},
+		"viz_HkjOU2Qc": {
+			"type": "splunk.pie",
+			"dataSources": {
+				"primary": "ds_Pm9AHvFu_ds_hsDs3Q0C"
+			},
+			"title": "Indicators categories",
+			"options": {
+				"seriesColors": [
+					"#009CEB",
+					"#00CDAF",
+					"#DD9900",
+					"#FF677B",
+					"#CB2196",
+					"#813193",
+					"#0051B5",
+					"#008C80",
+					"#99B100",
+					"#FFA476",
+					"#FF6ACE",
+					"#AE8CFF",
+					"#00689D",
+					"#00490A",
+					"#465D00",
+					"#9D6300",
+					"#F6540B",
+					"#FF969E",
+					"#E47BFE"
+				]
+			}
+		},
+		"viz_9n66ba1a": {
+			"type": "splunk.column",
+			"dataSources": {
+				"primary": "ds_nbAJEARh_ds_Pm9AHvFu_ds_hsDs3Q0C"
+			},
+			"title": "Indicators scores",
+			"showProgressBar": false,
+			"showLastUpdated": false,
+			"options": {
+				"seriesColors": [
+					"#009CEB",
+					"#00CDAF",
+					"#DD9900",
+					"#FF677B",
+					"#CB2196",
+					"#813193",
+					"#0051B5",
+					"#008C80",
+					"#99B100",
+					"#FFA476",
+					"#FF6ACE",
+					"#AE8CFF",
+					"#00689D",
+					"#00490A",
+					"#465D00",
+					"#9D6300",
+					"#F6540B",
+					"#FF969E",
+					"#E47BFE"
+				],
+				"overlayFields": []
+			}
+		},
+		"viz_ikaTm9Qp": {
+			"type": "splunk.pie",
+			"dataSources": {
+				"primary": "ds_PA2GTclu_ds_hsDs3Q0C"
+			},
+			"title": "Indicators markings",
+			"options": {
+				"seriesColors": [
+					"#009CEB",
+					"#00CDAF",
+					"#DD9900",
+					"#FF677B",
+					"#CB2196",
+					"#813193",
+					"#0051B5",
+					"#008C80",
+					"#99B100",
+					"#FFA476",
+					"#FF6ACE",
+					"#AE8CFF",
+					"#00689D",
+					"#00490A",
+					"#465D00",
+					"#9D6300",
+					"#F6540B",
+					"#FF969E",
+					"#E47BFE"
+				]
+			}
+		},
+		"viz_evDvpiyp": {
+			"type": "splunk.pie",
+			"dataSources": {
+				"primary": "ds_tR29ZhaJ_ds_PA2GTclu_ds_hsDs3Q0C"
+			},
+			"title": "Indicators creators",
+			"options": {
+				"seriesColors": [
+					"#009CEB",
+					"#00CDAF",
+					"#DD9900",
+					"#FF677B",
+					"#CB2196",
+					"#813193",
+					"#0051B5",
+					"#008C80",
+					"#99B100",
+					"#FFA476",
+					"#FF6ACE",
+					"#AE8CFF",
+					"#00689D",
+					"#00490A",
+					"#465D00",
+					"#9D6300",
+					"#F6540B",
+					"#FF969E",
+					"#E47BFE"
+				]
+			}
+		},
+		"viz_5zQ9Sd8b": {
+			"type": "splunk.bar",
+			"options": {
+				"legendDisplay": "off",
+				"xAxisTitleVisibility": "hide",
+				"showYMajorGridLines": false,
+				"stackMode": "stacked100",
+				"seriesColorsByField": {},
+				"seriesColors": [
+					"#CB2196",
+					"#813193",
+					"#0051B5",
+					"#008C80",
+					"#99B100",
+					"#FFA476",
+					"#FF6ACE",
+					"#AE8CFF",
+					"#00689D",
+					"#00490A",
+					"#465D00",
+					"#9D6300",
+					"#F6540B",
+					"#FF969E",
+					"#E47BFE"
+				],
+				"seriesSpacing": 7,
+				"dataValuesDisplay": "minmax",
+				"overlayFields": []
+			},
+			"dataSources": {
+				"primary": "ds_R0rMZ4Ao"
+			},
+			"showProgressBar": false,
+			"showLastUpdated": false,
+			"title": "Indicators labels"
+		},
+		"viz_RNRn4vUT": {
+			"type": "splunk.singlevalue",
+			"dataSources": {
+				"primary": "ds_z5ZhhLJx_ds_PYxsaacd"
+			},
+			"title": "Revoked Indicators"
+		},
+		"viz_RpThDNok": {
+			"type": "splunk.image",
+			"options": {
+				"preserveAspectRatio": true
+			}
 		}
 	},
 	"dataSources": {
@@ -26,6 +252,98 @@
 				"query": "| inputlookup opencti_lookup | stats count"
 			},
 			"name": "OpenCTI Indicators Count"
+		},
+		"ds_YI12Xgn7": {
+			"type": "ds.search",
+			"options": {
+				"query": "| inputlookup opencti_lookup | eval added_at = strptime(added_at, \"%Y-%m-%dT%H:%M:%SZ\") | eval _time = added_at | timechart count AS Count",
+				"queryParameters": {
+					"earliest": "$global_time.earliest$",
+					"latest": "$global_time.latest$"
+				}
+			},
+			"name": "OpenCTI added IOCs over time"
+		},
+		"ds_hsDs3Q0C": {
+			"type": "ds.search",
+			"options": {
+				"query": "| inputlookup opencti_lookup | stats count by type",
+				"queryParameters": {
+					"earliest": "$global_time.earliest$",
+					"latest": "$global_time.latest$"
+				}
+			},
+			"name": "OpenCTI IOCs per type"
+		},
+		"ds_Pm9AHvFu_ds_hsDs3Q0C": {
+			"type": "ds.search",
+			"options": {
+				"query": "| inputlookup opencti_lookup | stats count by indicator_types",
+				"queryParameters": {
+					"earliest": "$global_time.earliest$",
+					"latest": "$global_time.latest$"
+				}
+			},
+			"name": "OpenCTI IOCs per indicator_type"
+		},
+		"ds_N5ccv7a7_ds_Pm9AHvFu_ds_hsDs3Q0C": {
+			"type": "ds.search",
+			"options": {
+				"query": "| inputlookup opencti_lookup | stats count by indicator_types"
+			},
+			"name": "OpenCTI IOCs per indicator_type copy 1"
+		},
+		"ds_nbAJEARh_ds_Pm9AHvFu_ds_hsDs3Q0C": {
+			"type": "ds.search",
+			"options": {
+				"query": "| inputlookup opencti_lookup | stats count by score",
+				"queryParameters": {
+					"earliest": "$global_time.earliest$",
+					"latest": "$global_time.latest$"
+				}
+			},
+			"name": "OpenCTI IOCs per score"
+		},
+		"ds_PA2GTclu_ds_hsDs3Q0C": {
+			"type": "ds.search",
+			"options": {
+				"query": "| inputlookup opencti_lookup | stats count by markings",
+				"queryParameters": {
+					"earliest": "$global_time.earliest$",
+					"latest": "$global_time.latest$"
+				}
+			},
+			"name": "OpenCTI IOCs per markings"
+		},
+		"ds_tR29ZhaJ_ds_PA2GTclu_ds_hsDs3Q0C": {
+			"type": "ds.search",
+			"options": {
+				"query": "| inputlookup opencti_lookup | stats count by created_by",
+				"queryParameters": {
+					"earliest": "$global_time.earliest$",
+					"latest": "$global_time.latest$"
+				}
+			},
+			"name": "OpenCTI IOCs per Creator"
+		},
+		"ds_R0rMZ4Ao": {
+			"type": "ds.search",
+			"options": {
+				"query": "| inputlookup opencti_lookup | stats count by labels",
+				"queryParameters": {
+					"earliest": "$global_time.earliest$",
+					"latest": "$global_time.latest$"
+				}
+			},
+			"name": "OpenCTI Indicators per Labels"
+		},
+		"ds_z5ZhhLJx_ds_PYxsaacd": {
+			"type": "ds.search",
+			"options": {
+				"query": "| inputlookup opencti_lookup | stats by revoked",
+				"queryParameters": {}
+			},
+			"name": "OpenCTI Indicators Revoked"
 		}
 	},
 	"defaults": {
@@ -47,34 +365,115 @@
 				"token": "global_time",
 				"defaultValue": "-24h@h,now"
 			},
-			"title": "Période globale"
+			"title": "Time Range"
 		}
 	},
 	"layout": {
 		"type": "absolute",
 		"options": {
 			"width": 1440,
-			"height": 960
+			"height": 960,
+			"display": "fit-to-width"
 		},
 		"structure": [
-			{
-				"item": "viz_dCBGEBc7",
-				"type": "block",
-				"position": {
-					"x": 0,
-					"y": 0,
-					"w": 300,
-					"h": 300
-				}
-			},
 			{
 				"item": "viz_JYABKy8F",
 				"type": "block",
 				"position": {
-					"x": 300,
+					"x": 10,
 					"y": 0,
-					"w": 250,
-					"h": 250
+					"w": 350,
+					"h": 150
+				}
+			},
+			{
+				"item": "viz_Fd89pVRP",
+				"type": "block",
+				"position": {
+					"x": 370,
+					"y": 0,
+					"w": 1060,
+					"h": 310
+				}
+			},
+			{
+				"item": "viz_j5FlJLaK",
+				"type": "block",
+				"position": {
+					"x": 10,
+					"y": 320,
+					"w": 480,
+					"h": 300
+				}
+			},
+			{
+				"item": "viz_HkjOU2Qc",
+				"type": "block",
+				"position": {
+					"x": 500,
+					"y": 320,
+					"w": 480,
+					"h": 300
+				}
+			},
+			{
+				"item": "viz_9n66ba1a",
+				"type": "block",
+				"position": {
+					"x": 990,
+					"y": 320,
+					"w": 440,
+					"h": 300
+				}
+			},
+			{
+				"item": "viz_ikaTm9Qp",
+				"type": "block",
+				"position": {
+					"x": 10,
+					"y": 630,
+					"w": 480,
+					"h": 300
+				}
+			},
+			{
+				"item": "viz_evDvpiyp",
+				"type": "block",
+				"position": {
+					"x": 500,
+					"y": 630,
+					"w": 480,
+					"h": 300
+				}
+			},
+			{
+				"item": "viz_5zQ9Sd8b",
+				"type": "block",
+				"position": {
+					"x": 990,
+					"y": 630,
+					"w": 440,
+					"h": 300
+				}
+			},
+			{
+				"item": "viz_RNRn4vUT",
+				"type": "block",
+				"position": {
+					"x": 10,
+					"y": 160,
+					"w": 350,
+					"h": 150
+				}
+			},
+			{
+				"item": "viz_RpThDNok",
+				"type": "block",
+				"position": {
+					"x": 480,
+					"y": 320,
+					"w": 300,
+					"h": 300
 				}
 			}
 		],
@@ -83,7 +482,7 @@
 		]
 	},
 	"description": "",
-	"title": "OpenCTI Indicators"
+	"title": "Indicators Dashboard"
 }
     ]]></definition>
     <meta type="hiddenElements"><![CDATA[

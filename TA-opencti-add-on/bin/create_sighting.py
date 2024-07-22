@@ -15,6 +15,10 @@ class AlertActionWorkercreate_sighting(ModularAlertBase):
         super(AlertActionWorkercreate_sighting, self).__init__(ta_name, alert_name)
 
     def validate_params(self):
+
+        if not self.get_param("observables_extraction"):
+            self.log_error('observables_extraction is a mandatory parameter, but its value is None.')
+            return False
         return True
 
     def process_event(self, *args, **kwargs):

@@ -42,8 +42,17 @@ fields = [
             min_len=0, 
             max_len=8192, 
         )
-    ), 
-
+    ),
+    field.RestField(
+        'import_from',
+        required=False,
+        encrypted=False,
+        default='30',
+        validator=validator.String(
+            min_len=0,
+            max_len=8192,
+        )
+    ),
     field.RestField(
         'disabled',
         required=False,

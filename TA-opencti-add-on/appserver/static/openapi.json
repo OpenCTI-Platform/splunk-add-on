@@ -163,6 +163,9 @@
                     "stream_id": {
                         "type": "string"
                     },
+                    "import_from": {
+                        "type": "string"
+                    },
                     "disabled": {
                         "type": "string",
                         "enum": [
@@ -182,6 +185,9 @@
                         "type": "string"
                     },
                     "stream_id": {
+                        "type": "string"
+                    },
+                    "import_from": {
                         "type": "string"
                     },
                     "disabled": {
@@ -206,6 +212,9 @@
                         "type": "string"
                     },
                     "stream_id": {
+                        "type": "string"
+                    },
+                    "import_from": {
                         "type": "string"
                     }
                 }

@@ -233,6 +233,10 @@
                     {
                         "field": "stream_id",
                         "label": "Stream ID"
+                    },
+                    {
+                        "field": "import_from",
+                        "label": "Import from date"
                     }
                 ],
                 "actions": [
@@ -271,9 +275,9 @@
                             "field": "interval",
                             "label": "Interval",
                             "type": "text",
-                            "defaultValue": "-1",
+                            "defaultValue": "0",
                             "required": true,
-                            "help": "Time interval of input in seconds.",
+                            "help": "Time interval of input in seconds",
                             "validators": [
                                 {
                                     "type": "regex",
@@ -305,8 +309,24 @@
                         {
                             "field": "stream_id",
                             "label": "Stream ID",
-                            "help": "",
+                            "help": "OpenCTI Stream Id to consume",
                             "required": true,
+                            "type": "text",
+                            "validators": [
+                                {
+                                    "type": "string",
+                                    "minLength": 0,
+                                    "maxLength": 8192,
+                                    "errorMsg": "Max length of text input is 8192"
+                                }
+                            ]
+                        },
+                        {
+                            "field": "import_from",
+                            "label": "Import from (days)",
+                            "help": "The number of days to go back for the initial data collection. The start date is calculated on the basis of the current UTC time.",
+                            "required": false,
+                            "defaultValue": "30",
                             "type": "text",
                             "validators": [
                                 {
