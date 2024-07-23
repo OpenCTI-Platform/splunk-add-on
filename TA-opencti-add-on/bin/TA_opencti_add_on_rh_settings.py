@@ -96,7 +96,7 @@ fields_additional_parameters = [
         'opencti_url',
         required=True,
         encrypted=False,
-        default='',
+        default=None,
         validator=validator.String(
             min_len=0, 
             max_len=8192, 
@@ -106,7 +106,7 @@ fields_additional_parameters = [
         'opencti_api_key',
         required=True,
         encrypted=True,
-        default='',
+        default=None,
         validator=validator.String(
             min_len=0, 
             max_len=8192, 

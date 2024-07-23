@@ -3,10 +3,9 @@ from datetime import datetime, timezone, timedelta
 import json
 import splunklib.client as client
 from filigran_sseclient import SSEClient
-import time
 from stix2patterns.v21.pattern import Pattern
 import six
-from ta_opencti_add_on.common import get_proxy_config
+from ta_opencti_add_on.utils import get_proxy_config
 import sys
 
 '''
