@@ -196,40 +196,15 @@
 			}
 		},
 		"viz_5zQ9Sd8b": {
-			"type": "splunk.bar",
-			"options": {
-				"legendDisplay": "off",
-				"xAxisTitleVisibility": "hide",
-				"showYMajorGridLines": false,
-				"stackMode": "stacked100",
-				"seriesColorsByField": {},
-				"seriesColors": [
-					"#CB2196",
-					"#813193",
-					"#0051B5",
-					"#008C80",
-					"#99B100",
-					"#FFA476",
-					"#FF6ACE",
-					"#AE8CFF",
-					"#00689D",
-					"#00490A",
-					"#465D00",
-					"#9D6300",
-					"#F6540B",
-					"#FF969E",
-					"#E47BFE"
-				],
-				"seriesSpacing": 7,
-				"dataValuesDisplay": "minmax",
-				"overlayFields": []
-			},
+			"type": "splunk.pie",
+			"options": {},
 			"dataSources": {
 				"primary": "ds_R0rMZ4Ao"
 			},
 			"showProgressBar": false,
 			"showLastUpdated": false,
-			"title": "Indicators labels"
+			"title": "Indicators labels",
+			"context": {}
 		},
 		"viz_RNRn4vUT": {
 			"type": "splunk.singlevalue",
@@ -237,12 +212,6 @@
 				"primary": "ds_z5ZhhLJx_ds_PYxsaacd"
 			},
 			"title": "Revoked Indicators"
-		},
-		"viz_RpThDNok": {
-			"type": "splunk.image",
-			"options": {
-				"preserveAspectRatio": true
-			}
 		}
 	},
 	"dataSources": {
@@ -464,16 +433,6 @@
 					"y": 160,
 					"w": 350,
 					"h": 150
-				}
-			},
-			{
-				"item": "viz_RpThDNok",
-				"type": "block",
-				"position": {
-					"x": 480,
-					"y": 320,
-					"w": 300,
-					"h": 300
 				}
 			}
 		],
