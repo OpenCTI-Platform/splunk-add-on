@@ -190,11 +190,15 @@ The following list describe list of supported fields:
 | `octi_user_account`                | User account address observable       |    
 
 You can use the Splunk ```eval``` command to create a new field based on the value of another field.
-Example: 
 
- ```sourcetype=* | lookup opencti_lookup value as url_domain OUTPUT id as match_ioc_id | search match_ioc_id=* | eval octi_domain=url_domain | eval octi_url=url ```
+Example:
+
+```sourcetype=* | lookup opencti_lookup value as url_domain OUTPUT id as match_ioc_id | search match_ioc_id=* | eval octi_domain=url_domain | eval octi_url=url ```
 
 
+Logs related to OpenCTI customer alerts are available in the following two log file:
+```$SPLUNK_HOME/var/log/splunk/opencti_create_incident_modalert.log```
+```$SPLUNK_HOME/var/log/splunk/opencti_create_incident_response_modalert.log```
 
 
 
