@@ -101,6 +101,8 @@ You can monitor the import of these indicators using the following Splunk query 
 
 You can also consult the "Indicators Dashboard" which gives an overview of the data ingested.
 
+![](./.github/img/indicators_dashoard.png "Indicators Dashboard")
+
 
 The ingestion process can also be monitored by consulting the log file ```ta_opencti_add_on_opencti_indicators.log``` present in the directory ```$SPLUNK_HOME/var/log/splunk/```
 
@@ -197,7 +199,9 @@ Example:
 
 
 Logs related to OpenCTI customer alerts are available in the following two log file:
+
 ```$SPLUNK_HOME/var/log/splunk/opencti_create_incident_modalert.log```
+
 ```$SPLUNK_HOME/var/log/splunk/opencti_create_incident_response_modalert.log```
 
 
