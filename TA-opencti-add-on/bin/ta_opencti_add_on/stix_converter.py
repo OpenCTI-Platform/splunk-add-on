@@ -24,45 +24,45 @@ def _extract_observables_from_cim_model(event, marking, creator):
     :return:
     """
     observables = []
-    if "url" in event:
+    if "url" in event and event.get("url") != "":
         observables.append({"type": "url", "value": event.get("url")})
-    if "url_domain" in event:
+    if "url_domain" in event and event.get("url_domain") != "":
         observables.append({"type": "domain", "value": event.get("url_domain")})
-    if "user" in event and event.get("user") != "unknown":
+    if "user" in event and event.get("user") != "unknown" and event.get("user") != "":
         observables.append({"type": "user_account", "value": event.get("user")})
-    if "user_name" in event and event.get("user") != "unknown":
+    if "user_name" in event and event.get("user_name") != "unknown" and event.get("user_name") != "":
         observables.append({"type": "user_account", "value": event.get("user_name")})
-    if "user_agent" in event:
+    if "user_agent" in event and event.get("user_agent") != "":
         observables.append({"type": "user_agent", "value": event.get("http_user_agent")})
-    if "http_user_agent" in event:
+    if "http_user_agent" in event and event.get("http_user_agent") != "":
         observables.append({"type": "user_agent", "value": event.get("http_user_agent")})
-    if "dest" in event:
+    if "dest" in event and event.get("dest") != "":
         if is_ipv4(event.get("dest")):
             observables.append({"type": "ipv4", "value": event.get("dest")})
         elif is_ipv6(event.get("dest")):
             observables.append({"type": "ipv6", "value": event.get("dest")})
         else:
             observables.append({"type": "hostname", "value": event.get("dest")})
-    if "dest_ip" in event:
+    if "dest_ip" in event and event.get("dest_ip") != "":
         if is_ipv4(event.get("dest_ip")):
             observables.append({"type": "ipv4", "value": event.get("dest_ip")})
         if is_ipv6(event.get("dest_ip")):
             observables.append({"type": "ipv6", "value": event.get("dest_ip")})
-    if "src" in event:
+    if "src" in event and event.get("src") != "":
         if is_ipv4(event.get("src")):
             observables.append({"type": "ipv4", "value": event.get("src")})
         elif is_ipv6(event.get("src")):
             observables.append({"type": "ipv6", "value": event.get("src")})
         else:
             observables.append({"type": "hostname", "value": event.get("src")})
-    if "src_ip" in event:
+    if "src_ip" in event and event.get("src_ip") != "":
         if is_ipv4(event.get("src_ip")):
             observables.append({"type": "ipv4", "value": event.get("src_ip")})
         if is_ipv6(event.get("src_ip")):
             observables.append({"type": "ipv6", "value": event.get("src_ip")})
-    if "file_hash" in event:
+    if "file_hash" in event and event.get("file_hash") != "":
         observables.append({"type": "hash", "value": event.get("file_hash")})
-    if "file_name" in event:
+    if "file_name" in event and event.get("file_name") != "":
         observables.append({"type": "file_name", "value": event.get("file_name")})
 
     return _convert_observables_to_stix(observables, marking, creator)
@@ -243,6 +243,7 @@ def _convert_observables_to_stix(observables, marking, creator):
         if observable.get("type") == "user_account":
             stix_observable = stix2.UserAccount(
                 account_login=observable.get("value"),
+                display_name=observable.get("value"),
                 object_marking_refs=[marking],
                 custom_properties=customer_properties
             )
