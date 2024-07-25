@@ -150,7 +150,7 @@ To extract and model alert fields as OpenCTI observables attached to the inciden
 
 #### CIM model
 
-The “CIM Model” method is based on the definition of CIM model fields. With this method, the Add-on will extract all the following fields and model them as follows:
+The “CIM model” method is based on the definition of CIM model fields. With this method, the Add-on will extract all the following fields and model them as follows:
 
 | CIM Field         | Observable type                     |
 |-------------------|-------------------------------------|
