@@ -81,10 +81,10 @@ Proceed as follows to enable the ingestion of indicators:
 | Parameter       | Description                                                                                                    |
 |-----------------|----------------------------------------------------------------------------------------------------------------|
 | `Name`          | Unique name for the input being configured                                                                     |
-| `Interval`      | Time interval of input in seconds. Leave as default (0) to allow continuous execution of the ingestion process. |
+| `Interval`      | Time interval of input in seconds. Leave as default (0) to allow continuous execution of the ingestion process |
 | `Index`         | The index that the data will be stored in (default)                                                            |
 | `Stream Id`     | The Live Stream ID of the OpenCTI stream to consume                                                            |
-| `Import from`   | The number of days to go back for the initial data collection (default: 30) (optional)                                      |
+| `Import from`   | The number of days to go back for the initial data collection (default: 30) (optional)                         |
 
 4. Once the Input parameters have been correctly configured click "Add".
 

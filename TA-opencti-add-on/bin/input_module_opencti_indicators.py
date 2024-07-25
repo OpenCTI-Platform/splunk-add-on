@@ -276,9 +276,10 @@ def collect_events(helper, ew):
     if state is None:
         helper.log_info("No state, going to initialize it")
         import_from = helper.get_arg('import_from')
-        start_date = datetime.utcnow().replace(microsecond=0) - timedelta(days=int(import_from))
-        start_date_timestamp = int(datetime.timestamp(start_date))
-        state = {"start_from": str(start_date_timestamp)}
+        recover_until =  datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ")
+        start_date = datetime.utcnow() - timedelta(days=int(import_from))
+        start_date_timestamp = int(datetime.timestamp(start_date)) * 1000
+        state = {"start_from": str(start_date_timestamp)+"-0", "recover_until": recover_until}
         helper.log_info(f"Initialized state: {state}")
     else:
         state = json.loads(state)
