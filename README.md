@@ -18,7 +18,7 @@ The app is installed
 
 ### Installing from file
 
-1. Download latest version of the Splunk App: TA-opencti-add-on-1.0.0.spl (link)
+1. Download latest version of the Splunk App: [TA-opencti-add-on-1.0.0.spl] (https://github.com/OpenCTI-Platform/splunk-add-on/releases/download/1.0.0/TA-opencti-add-on-1.0.0.spl)
 2. Log in to the Splunk Web UI and navigate to "Apps" and click on "Manage Apps"
 3. Click "Install app from file"
 4. Choose file and select the "TA-opencti-add-on-1.0.0.spl" file
