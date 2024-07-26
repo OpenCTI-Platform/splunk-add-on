@@ -258,11 +258,6 @@ def collect_events(helper, ew):
     # get connection configuration
     opencti_url = helper.get_global_setting("opencti_url")
     opencti_api_key = helper.get_global_setting("opencti_api_key")
-    disable_ssl_verification = helper.get_global_setting("disable_ssl_verification")
-    verif_ssl = True
-    if disable_ssl_verification == "1":
-        verif_ssl = False
-    helper.log_debug(f"Verify SSL: {verif_ssl}")
 
     stream_id = helper.get_arg('stream_id')
     helper.log_info(f"going to fetch data of OpenCTI stream.id: {stream_id}")

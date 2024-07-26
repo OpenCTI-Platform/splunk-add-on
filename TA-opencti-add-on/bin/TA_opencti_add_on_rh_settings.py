@@ -97,9 +97,8 @@ fields_additional_parameters = [
         required=True,
         encrypted=False,
         default=None,
-        validator=validator.String(
-            min_len=0, 
-            max_len=8192, 
+        validator=validator.Pattern(
+            regex=r"""^https://[0-9a-zA-Z\-\.]+(?:\:\d+)?""",
         )
     ), 
     field.RestField(
@@ -111,14 +110,7 @@ fields_additional_parameters = [
             min_len=0, 
             max_len=8192, 
         )
-    ),
-    field.RestField(
-        'disable_ssl_verification',
-        required=False,
-        encrypted=False,
-        default=None,
-        validator=None
-    ),
+    )
 ]
 model_additional_parameters = RestModel(fields_additional_parameters, name='additional_parameters')
 
