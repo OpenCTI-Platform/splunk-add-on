@@ -46,11 +46,10 @@ Proceed as follows to enable the "stateless mode" option:
 1. Navigate to Splunk Web UI home page, open the "OpenCTI add-on for Splunk" and navigate to "Configuration" page.
 2. Click on "Add-on settings" tab and complete the form with the required settings:
 
-| Parameter                  | Description                                  |
-|----------------------------|----------------------------------------------|
-| `OpenCTI URL`              | The URL of the OpenCTI platform              |
-| `OpenCTI API Key`          | The API Token of the previously created user |
-| `Disable SSL verification` | Enable or disable SSL verification           |
+| Parameter                  | Description                                                     |
+|----------------------------|-----------------------------------------------------------------|
+| `OpenCTI URL`              | The URL of the OpenCTI platform (A HTTPS connection is required |
+| `OpenCTI API Key`          | The API Token of the previously created user                    |
 
 ![](./.github/img/addon_settings.png "Add-on settings")
 
