@@ -1,7 +1,7 @@
 import requests
 
 from utils import get_proxy_config
-
+from constants import VERIFY_SSL
 
 class SplunkAppConnectorHelper:
     def __init__(
@@ -22,13 +22,9 @@ class SplunkAppConnectorHelper:
         self.api_url = self.opencti_url + "/graphql"
 
         # manage SSL verification
-        disable_ssl_verification = splunk_helper.get_global_setting("disable_ssl_verification")
-        verif_ssl = True
-        if disable_ssl_verification == "1":
-            verif_ssl = False
-        splunk_helper.log_debug(f"verify SSL: {verif_ssl}")
-        self.verify_ssl = verif_ssl
+        splunk_helper.log_debug(f"verify SSL: {VERIFY_SSL}")
 
+        # manage proxies configuration
         self.proxies = get_proxy_config(splunk_helper)
 
     def register(self):
@@ -77,7 +73,7 @@ class SplunkAppConnectorHelper:
             url=self.api_url,
             json={"query": query, "variables": input},
             headers=self.headers,
-            verify=self.verify_ssl,
+            verify=VERIFY_SSL,
             proxies=self.proxies
         )
 
@@ -105,7 +101,7 @@ class SplunkAppConnectorHelper:
             url=self.api_url,
             json={"query": query, "variables": variables},
             headers=self.headers,
-            verify=self.verify_ssl,
+            verify=VERIFY_SSL,
             proxies=self.proxies
         )
         if r.status_code != 200:

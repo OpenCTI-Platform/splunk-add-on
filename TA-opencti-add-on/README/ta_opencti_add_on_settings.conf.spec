@@ -13,4 +13,3 @@ loglevel =
 [additional_parameters]
 opencti_url = 
 opencti_api_key =
-disable_ssl_verification =
