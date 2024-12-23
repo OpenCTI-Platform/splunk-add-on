@@ -6,6 +6,8 @@ from filigran_sseclient import SSEClient
 from stix2patterns.v21.pattern import Pattern
 import six
 from ta_opencti_add_on.utils import get_proxy_config
+from ta_opencti_add_on.constants import VERIFY_SSL
+
 import sys
 
 '''
@@ -296,7 +298,7 @@ def collect_events(helper, ew):
                 "no-dependencies": "true",
                 "with-inferences": "true",
             },
-            verify=True,
+            verify=VERIFY_SSL,
             proxies=proxies
         )
 
