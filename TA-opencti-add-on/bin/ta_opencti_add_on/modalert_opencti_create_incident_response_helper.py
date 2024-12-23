@@ -6,11 +6,17 @@ from app_connector_helper import SplunkAppConnectorHelper
 from stix_converter import convert_to_incident_response
 from constants import CONNECTOR_NAME, CONNECTOR_ID
 
+
 def create_incident_response(helper, event):
-    if helper.get_param("labels") == '':
-        labels = []
-    else:
+    """
+    :param helper:
+    :param event:
+    :return:
+    """
+    if helper.get_param("labels"):
         labels = [x.strip() for x in helper.get_param("labels").split(',')]
+    else:
+        labels = []
     # remove potential empty labels
     labels = list(filter(None, labels))
 
