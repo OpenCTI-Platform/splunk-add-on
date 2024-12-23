@@ -5,13 +5,13 @@
     "id": {
       "group": null,
       "name": "TA-opencti-add-on",
-      "version": "1.0.1"
+      "version": "1.0.2"
     },
     "author": [
       {
         "name": "Filigran",
-        "email": null,
-        "company": null
+        "email": contact@filigran.io,
+        "company": Filigran
       }
     ],
     "releaseDate": null,
