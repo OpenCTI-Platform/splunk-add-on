@@ -68,7 +68,7 @@ If a proxy configuration is required to connect to OpenCTI platform, you can con
 ## OpenCTI Indicators Inputs Configuration
 
 The “OpenCTI Add-On for Splunk” enables Splunk to be feed with indicators exposed through a live stream. To do this, the add-on implements and manages Splunk modular inputs. 
-Indicators are stored in a dedicated kvstore named “opencti_iocs”. 
+Indicators are stored in a dedicated kvstore named “opencti_indicators”. 
 A default lookup definition named "opencti_lookup" is also implemented to facilitate indicator management.
 
 Proceed as follows to enable the ingestion of indicators:
