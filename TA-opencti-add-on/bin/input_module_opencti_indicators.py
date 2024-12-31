@@ -1,14 +1,15 @@
 # encoding = utf-8
-from datetime import datetime, timezone, timedelta
 import json
+import sys
+from datetime import datetime, timezone, timedelta
+
+import six
 import splunklib.client as client
 from filigran_sseclient import SSEClient
 from stix2patterns.v21.pattern import Pattern
-import six
-from ta_opencti_add_on.utils import get_proxy_config
-from ta_opencti_add_on.constants import VERIFY_SSL
 
-import sys
+from ta_opencti_add_on.constants import VERIFY_SSL, INDICATORS_KVSTORE_NAME
+from ta_opencti_add_on.utils import get_proxy_config
 
 '''
     IMPORTANT
@@ -38,6 +39,7 @@ MARKING_DEFs = {}
 
 IDENTITY_DEFs = {}
 
+
 def date_now_z():
     """get the current date (UTC)
     :return: current datetime for utc
@@ -50,6 +52,7 @@ def date_now_z():
         .replace("+00:00", "Z")
     )
 
+
 def validate_input(helper, definition):
     """Implement your own validation logic to validate the input stanza configurations"""
     # This example accesses the modular input variable
@@ -58,12 +61,18 @@ def validate_input(helper, definition):
 
 
 def exist_in_kvstore(kv_store, key_id):
+    """
+    :param kv_store:
+    :param key_id:
+    :return:
+    """
     try:
         kv_store.query_by_id(key_id)
         exist = True
     except:
         exist = False
     return exist
+
 
 def sanitize_key(key):
     """Sanitize key name for Splunk usage
@@ -80,7 +89,12 @@ def sanitize_key(key):
     """
     return key.replace(".", ":").replace("'", "")
 
+
 def parse_stix_pattern(stix_pattern):
+    """
+    :param stix_pattern:
+    :return:
+    """
     parsed_pattern = Pattern(stix_pattern)
     for observable_type, comparisons in six.iteritems(
             parsed_pattern.inspect().comparisons
@@ -95,9 +109,14 @@ def parse_stix_pattern(stix_pattern):
                             "value": obj_value.strip("'")
                         }
 
-def enrich_payload(splunk_helper, payload):
 
-    # add stream id and input name #TODO: check if it's usefull
+def enrich_payload(splunk_helper, payload):
+    """
+    :param splunk_helper:
+    :param payload:
+    :return:
+    """
+    # add stream id and input name #TODO: check if it's useful
     payload["stream_id"] = splunk_helper.get_arg('stream_id')
     payload["input_name"] = splunk_helper.get_input_stanza_names()
 
@@ -246,12 +265,14 @@ def collect_events(helper, ew):
         raise Exception("Unable to initialize connection with Splunk, Splunk client is None")
 
     # manage kvstore
+    """
     indicators_kvstore = "opencti_indicators"
     try:
         # Create KV Store if it doesn't exist
         splunk.kvstore.create(indicators_kvstore)
     except Exception as ex:
         helper.log_info(f"An exception occurred while creating kv_store, {ex}")
+    """
 
     # get proxy setting configuration
     proxies = get_proxy_config(helper)
@@ -265,7 +286,7 @@ def collect_events(helper, ew):
     helper.log_info(f"going to fetch data of OpenCTI stream.id: {stream_id}")
 
     # load kvstore
-    kv_store = splunk.kvstore[indicators_kvstore].data
+    kv_store = splunk.kvstore[INDICATORS_KVSTORE_NAME].data
 
     # get stream state
     state = helper.get_check_point(input_name)
@@ -273,7 +294,7 @@ def collect_events(helper, ew):
     if state is None:
         helper.log_info("No state, going to initialize it")
         import_from = helper.get_arg('import_from')
-        recover_until =  datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ")
+        recover_until = datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ")
         start_date = datetime.utcnow() - timedelta(days=int(import_from))
         start_date_timestamp = int(datetime.timestamp(start_date)) * 1000
         state = {"start_from": str(start_date_timestamp)+"-0", "recover_until": recover_until}
@@ -283,7 +304,7 @@ def collect_events(helper, ew):
         helper.log_info(f"State: {state}")
 
     if "recover_until" in state:
-        live_stream_url = opencti_url+"/stream/"+stream_id+ "?recover=" + state.get("recover_until")
+        live_stream_url = opencti_url+"/stream/"+stream_id + "?recover=" + state.get("recover_until")
     else:
         live_stream_url = opencti_url+"/stream/"+stream_id
 
@@ -310,7 +331,8 @@ def collect_events(helper, ew):
                     if parsed_stix is None:
                         helper.log_error(f"Unable to process indicator: {data['name']} - {data['pattern']}")
                         continue
-                    helper.log_info("processing msg: "+ msg.event +" - "+ msg.id +" - "+parsed_stix['name']+" - "+parsed_stix['pattern'])
+                    helper.log_info("processing msg: " + msg.event + " - " + msg.id + " - " + parsed_stix['name']
+                                    + " - " + parsed_stix['pattern'])
                     if msg.event == "create" or msg.event == "update":
                         exist = exist_in_kvstore(kv_store, parsed_stix["_key"])
                         if exist:
@@ -324,13 +346,15 @@ def collect_events(helper, ew):
                             kv_store.delete_by_id(parsed_stix["_key"])
 
                 if data['type'] == "marking-definition":
-                    helper.log_info("processing msg: "+ msg.event +" - "+ msg.id +" - "+data['name']+" - "+data['id'])
+                    helper.log_info("processing msg: " + msg.event + " - " + msg.id +" - "
+                                    + data['name'] + " - " + data['id'])
                     if msg.event == "create" or msg.event == "update":
                         if data['id'] not in MARKING_DEFs:
                             MARKING_DEFs[data['id']] = data['name']
 
                 if data['type'] == "identity":
-                    helper.log_info("processing msg: "+ msg.event +" - "+ msg.id +" - "+data['name']+" - "+data['id'])
+                    helper.log_info("processing msg: " + msg.event + " - " + msg.id + " - "
+                                    + data['name'] + " - " + data['id'])
                     if msg.event == "create" or msg.event == "update":
                         if data['id'] not in IDENTITY_DEFs:
                             IDENTITY_DEFs[data['id']] = data['name']
