@@ -2,7 +2,7 @@
     "openapi": "3.0.0",
     "info": {
         "title": "TA-opencti-add-on",
-        "version": "1.0.2",
+        "version": "1.1.0",
         "description": "OpenCTI Add-on",
         "contact": {
             "name": "Filigran"
