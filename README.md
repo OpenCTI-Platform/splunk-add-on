@@ -18,10 +18,10 @@ The app is installed
 
 ### Installing from file
 
-1. Download latest version of the Splunk App: [TA-opencti-add-on-1.0.1.spl](https://github.com/OpenCTI-Platform/splunk-add-on/releases/download/1.0.1/TA-opencti-add-on-1.0.1.spl)
+1. Download latest version of the Splunk App: [TA-opencti-add-on-1.1.0.spl](https://github.com/OpenCTI-Platform/splunk-add-on/releases/download/1.1.0/TA-opencti-add-on-1.1.0.spl)
 2. Log in to the Splunk Web UI and navigate to "Apps" and click on "Manage Apps"
 3. Click "Install app from file"
-4. Choose file and select the "TA-opencti-add-on-1.0.1.spl" file
+4. Choose file and select the "TA-opencti-add-on-1.1.0.spl" file
 5. Click on Upload
 The app is installed
 
@@ -68,7 +68,7 @@ If a proxy configuration is required to connect to OpenCTI platform, you can con
 ## OpenCTI Indicators Inputs Configuration
 
 The “OpenCTI Add-On for Splunk” enables Splunk to be feed with indicators exposed through a live stream. To do this, the add-on implements and manages Splunk modular inputs. 
-Indicators are stored in a dedicated kvstore named “opencti_iocs”. 
+Indicators are stored in a dedicated kvstore named “opencti_indicators”. 
 A default lookup definition named "opencti_lookup" is also implemented to facilitate indicator management.
 
 Proceed as follows to enable the ingestion of indicators:
