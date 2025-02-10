@@ -1,0 +1,20 @@
+run-appinspect-api:
+  needs: build
+  runs-on: ubuntu-latest
+  steps:
+    - uses: actions/checkout@v3
+    - uses: actions/download-artifact@v4
+      with:
+        name: my-package
+        path: app-dir/
+    - name: appinspect-api
+      uses: splunk/appinspect-api-action@v3.0
+      with:
+        username: ${{ secrets.SPL_COM_USER }}
+        password: ${{ secrets.SPL_COM_PASSWORD }}
+        app_path: app-dir/
+    - uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: appinspect-api-html-report
+        path: AppInspect_response.html
