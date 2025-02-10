@@ -26,7 +26,7 @@ jobs:
         run: mkdir app-dir
       
       - name: Create package
-        run: ucc-gen package --path output/devtutorial_conf24 -o app-dir/
+        run: ucc-gen package --path output/TA-opencti-add-on -o app-dir/
       
       - name: Upload package
         uses: actions/upload-artifact@v4
