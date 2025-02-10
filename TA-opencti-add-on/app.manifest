@@ -45,7 +45,10 @@
   "platformRequirements": null,
   "supportedDeployments": [
     "_standalone",
-    "_distributed"
+    "_distributed",
+    "_search_head_clustering"
   ],
-  "targetWorkloads": null
+  "targetWorkloads": [
+    "*"
+  ]
 }
