@@ -20,7 +20,7 @@ jobs:
           pip install splunk-packaging-toolkit
 
       - name: Build an app using UCC
-        run: ucc-gen build
+        run: ucc-gen build --source TA-opencti-add-on
 
       - name: Create tmp folder
         run: mkdir app-dir
