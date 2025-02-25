@@ -1,0 +1,18 @@
+check_simplexml_standards_version:
+  comment: expected
+check_app_icon_2x_dimensions:
+  comment: expected
+check_app_icon_2x_is_png:
+  comment: expected
+check_app_icon_dimensions:
+  comment: expected
+check_app_icon_is_png:
+  comment: expected
+check_ignored_parameters_v2_command:
+  comment: expected
+check_basic_readme:
+  comment: expected
+check_for_binary_files_without_source_code:
+  comment: expected
+check_for_compiled_python:
+  comment: expected
