@@ -1,6 +1,7 @@
 # encoding = utf-8
 import json
 import sys
+import time
 from datetime import datetime, timezone, timedelta
 
 import six
@@ -141,7 +142,6 @@ def enrich_payload(splunk_helper, payload):
         return None
     payload["type"] = parsed_stix["type"]
     payload["value"] = parsed_stix["value"]
-    payload["value"] = parsed_stix["value"]
 
     if "extensions" in payload:
         for extension_definition in payload["extensions"].values():
@@ -160,6 +160,10 @@ def enrich_payload(splunk_helper, payload):
                         payload["_key"] = attribute_value
                     else:
                         payload[attribute_name] = attribute_value
+
+        if "detection" not in payload:
+            payload["detection"] = False
+
         # remove extensions
         del payload["extensions"]
 
@@ -324,44 +328,54 @@ def collect_events(helper, ew):
         )
 
         for msg in messages:
-            if msg.event in ["create", "update", "delete"]:
-                data = json.loads(msg.data)["data"]
-                if data['type'] == "indicator" and data['pattern_type'] == "stix":
-                    parsed_stix = enrich_payload(helper, data)
-                    if parsed_stix is None:
-                        helper.log_error(f"Unable to process indicator: {data['name']} - {data['pattern']}")
-                        continue
-                    helper.log_info("processing msg: " + msg.event + " - " + msg.id + " - " + parsed_stix['name']
-                                    + " - " + parsed_stix['pattern'])
-                    if msg.event == "create" or msg.event == "update":
-                        exist = exist_in_kvstore(kv_store, parsed_stix["_key"])
-                        if exist:
-                            kv_store.update(parsed_stix["_key"], parsed_stix)
-                        else:
+            try:
+                if msg.event in ["create", "update", "delete"]:
+                    data = json.loads(msg.data)["data"]
+                    if data['type'] == "indicator" and data['pattern_type'] == "stix":
+                        parsed_stix = enrich_payload(helper, data)
+                        if parsed_stix is None:
+                            helper.log_error(f"Unsupported indicator pattern: {data['name']} - {data['pattern']}")
+                            continue
+                        helper.log_info("processing msg: " + msg.event + " - " + msg.id + " - " + parsed_stix['name']
+                                        + " - " + parsed_stix['pattern'])
+                        if msg.event == "create" or msg.event == "update":
+                            # update code to use bach_save
                             parsed_stix['added_at'] = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
-                            kv_store.insert(parsed_stix)
-                    if msg.event == "delete":
-                        exist = exist_in_kvstore(kv_store, parsed_stix["_key"])
-                        if exist:
-                            kv_store.delete_by_id(parsed_stix["_key"])
+                            kv_store.batch_save(*[parsed_stix])
+                            """
+                            exist = exist_in_kvstore(kv_store, parsed_stix["_key"])
+                            if exist:
+                                parsed_stix['added_at'] = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+                                kv_store.update(parsed_stix["_key"], parsed_stix)
+                            else:
+                                parsed_stix['added_at'] = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+                                kv_store.insert(parsed_stix)
+                            """
+                        if msg.event == "delete":
+                            exist = exist_in_kvstore(kv_store, parsed_stix["_key"])
+                            if exist:
+                                kv_store.delete_by_id(parsed_stix["_key"])
 
-                if data['type'] == "marking-definition":
-                    helper.log_info("processing msg: " + msg.event + " - " + msg.id +" - "
-                                    + data['name'] + " - " + data['id'])
-                    if msg.event == "create" or msg.event == "update":
-                        if data['id'] not in MARKING_DEFs:
-                            MARKING_DEFs[data['id']] = data['name']
+                    if data['type'] == "marking-definition":
+                        helper.log_info("processing msg: " + msg.event + " - " + msg.id +" - "
+                                        + data['name'] + " - " + data['id'])
+                        if msg.event == "create" or msg.event == "update":
+                            if data['id'] not in MARKING_DEFs:
+                                MARKING_DEFs[data['id']] = data['name']
 
-                if data['type'] == "identity":
-                    helper.log_info("processing msg: " + msg.event + " - " + msg.id + " - "
-                                    + data['name'] + " - " + data['id'])
-                    if msg.event == "create" or msg.event == "update":
-                        if data['id'] not in IDENTITY_DEFs:
-                            IDENTITY_DEFs[data['id']] = data['name']
+                    if data['type'] == "identity":
+                        helper.log_info("processing msg: " + msg.event + " - " + msg.id + " - "
+                                        + data['name'] + " - " + data['id'])
+                        if msg.event == "create" or msg.event == "update":
+                            if data['id'] not in IDENTITY_DEFs:
+                                IDENTITY_DEFs[data['id']] = data['name']
 
-                # update checkpoint (take 0:00:00.005544 to update)
-                state["start_from"] = msg.id
-                helper.save_check_point(input_name, json.dumps(state))
+                    # update checkpoint (take 0:00:00.005544 to update)
+                    state["start_from"] = msg.id
+                    helper.save_check_point(input_name, json.dumps(state))
+            except Exception as ex:
+                helper.log_debug(f"Error when processing message, reason: {ex}, msg: {msg}")
+
     except Exception as ex:
         helper.log_error(f"Error in ListenStream loop, exit, reason: {ex}")
         sys.excepthook(*sys.exc_info())
