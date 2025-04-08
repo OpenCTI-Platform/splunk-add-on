@@ -18,10 +18,10 @@ The app is installed
 
 ### Installing from file
 
-1. Download latest version of the Splunk App: [TA-opencti-add-on-1.1.2.spl](https://github.com/OpenCTI-Platform/splunk-add-on/releases/download/1.1.2/TA-opencti-add-on-1.1.2.spl)
+1. Download latest version of the Splunk App: [TA-opencti-add-on-1.1.4.spl](https://github.com/OpenCTI-Platform/splunk-add-on/releases/download/1.1.4/TA-opencti-add-on-1.1.4.spl)
 2. Log in to the Splunk Web UI and navigate to "Apps" and click on "Manage Apps"
 3. Click "Install app from file"
-4. Choose file and select the "TA-opencti-add-on-1.1.2.spl" file
+4. Choose file and select the "TA-opencti-add-on-1.1.4.spl" file
 5. Click on Upload
 The app is installed
 
@@ -202,8 +202,3 @@ Logs related to OpenCTI customer alerts are available in the following two log f
 ```$SPLUNK_HOME/var/log/splunk/opencti_create_incident_modalert.log```
 
 ```$SPLUNK_HOME/var/log/splunk/opencti_create_incident_response_modalert.log```
-
-
-
-
-
