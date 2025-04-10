@@ -8,7 +8,7 @@ from utils import generate_incident_id, generate_identity_id, generate_relation_
 
 def _get_stix_marking_id(value):
     if value == "tlp_clear":
-        return stix2.TLP_CLEAR
+        return stix2.TLP_WHITE
     if value == "tlp_green":
         return stix2.TLP_GREEN
     if value == "tlp_amber":
