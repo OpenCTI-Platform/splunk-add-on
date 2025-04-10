@@ -3,6 +3,7 @@ from datetime import datetime
 
 from stix_constants import CustomObservableUserAgent, CustomObservableText, CustomObjectCaseIncident
 from utils import get_hash_type, is_ipv6, is_ipv4
+from utils import generate_incident_id, generate_identity_id, generate_relation_id, generate_case_incident_id
 
 
 def _get_stix_marking_id(value):
@@ -268,6 +269,7 @@ def convert_to_incident_response(alert_params, event):
 
     # manage author
     stix_author = stix2.Identity(
+        id=generate_identity_id(event.get("host", "Splunk"), "system"),
         name=event.get("host", "Splunk"),
         identity_class="system"
     )
@@ -296,6 +298,7 @@ def convert_to_incident_response(alert_params, event):
 
     # create incident response case
     stix_case_incident = CustomObjectCaseIncident(
+        id=generate_case_incident_id(alert_params.get("name"), event_date),
         name=alert_params.get("name"),
         description=alert_params.get("description"),
         severity=alert_params.get("severity"),
@@ -330,6 +333,7 @@ def convert_to_incident(alert_params, event):
 
     # manage author
     stix_author = stix2.Identity(
+        id=generate_identity_id(event.get("host", "Splunk"), "system"),
         name=event.get("host", "Splunk"),
         identity_class="system"
     )
@@ -341,7 +345,8 @@ def convert_to_incident(alert_params, event):
         observables = _extract_observables_from_cim_model(
             event=event,
             marking=marking_id,
-            creator=stix_author)
+            creator=stix_author
+        )
         for observable in observables:
             bundle_objects.append(observable)
             observable_ref_ids.append(observable.id)
@@ -349,13 +354,15 @@ def convert_to_incident(alert_params, event):
         observables = _extract_observables_from_key_model(
             event=event,
             marking=marking_id,
-            creator=stix_author)
+            creator=stix_author
+        )
         for observable in observables:
             bundle_objects.append(observable)
             observable_ref_ids.append(observable.id)
 
     # create incident
     stix_incident = stix2.Incident(
+        id=generate_incident_id(alert_params.get("name"), event_date),
         name=alert_params.get("name"),
         created=event_date,
         description=alert_params.get("description"),
@@ -375,6 +382,8 @@ def convert_to_incident(alert_params, event):
 
     for observable_id in observable_ref_ids:
         stix_relation_account = stix2.Relationship(
+            id=generate_relation_id(
+                "related-to", observable_id, stix_incident.id),
             relationship_type="related-to",
             source_ref=observable_id,
             target_ref=stix_incident.id,
