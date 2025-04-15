@@ -38,7 +38,9 @@
       "uri": null
     }
   },
-  "dependencies": null,
+  "dependencies": {
+    "splunk-sdk": ">=1.8.0"
+  },
   "tasks": null,
   "inputGroups": null,
   "incompatibleApps": null,
@@ -47,5 +49,8 @@
     "_standalone",
     "_distributed"
   ],
-  "targetWorkloads": null
+  "targetWorkloads": [
+    "_search_heads",
+    "_forwarders"
+  ]
 }
