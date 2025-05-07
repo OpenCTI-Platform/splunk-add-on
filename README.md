@@ -133,7 +133,6 @@ Example of a configuration to create an incident in OpenCTI
 
 ![](./.github/img/alert_example.png "Alert Example")
 
-
 ### Observables extraction
 
 To extract and model alert fields as OpenCTI observables attached to the incident or incident response case, the Add-on purpose two methods describe below.
