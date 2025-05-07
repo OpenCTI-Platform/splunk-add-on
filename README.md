@@ -32,15 +32,6 @@ The app is installed
 Before configuring the App, we strongly recommend that you create a dedicated account in OpenCTI with the same properties as for a connector user account.
 To create this account, please refer to [Connector users and Tokens](https://docs.opencti.io/latest/deployment/connectors/?h=connector+user#connector-users-and-tokens) documentation.
 
-> [!WARNING]  
-> As the application can generate many requests to OpenCTI without maintaining an HTTP session, it's strongly recommended to activate the “Use stateless mode” option on this user account.
-
-Proceed as follows to enable the "stateless mode" option:
-1. Update the previously created user and click on "Advanced options"
-2. Enable the "Use stateless mode" options
-
-![](./.github/img/config_stateless_mode.png "Stateless Mode")
-
 ### General Add-On settings
 
 1. Navigate to Splunk Web UI home page, open the "OpenCTI add-on for Splunk" and navigate to "Configuration" page.
@@ -141,7 +132,6 @@ Tokens represent data that a search generates. They work as placeholders or vari
 Example of a configuration to create an incident in OpenCTI
 
 ![](./.github/img/alert_example.png "Alert Example")
-
 
 ### Observables extraction
 
