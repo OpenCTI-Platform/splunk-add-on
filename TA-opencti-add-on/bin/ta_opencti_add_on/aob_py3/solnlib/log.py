@@ -20,6 +20,7 @@ import logging
 import logging.handlers
 import os.path as op
 import traceback
+from functools import partial
 from threading import Lock
 from typing import Dict, Any
 
@@ -78,7 +79,7 @@ class Logs(metaclass=Singleton):
     _default_directory = None
     _default_namespace = None
     _default_log_format = (
-        "%(asctime)s %(levelname)s pid=%(process)d tid=%(threadName)s "
+        "%(asctime)s log_level=%(levelname)s pid=%(process)d tid=%(threadName)s "
         "file=%(filename)s:%(funcName)s:%(lineno)d | %(message)s"
     )
     _default_log_level = logging.INFO
@@ -251,30 +252,115 @@ def modular_input_end(logger: logging.Logger, modular_input_name: str):
     )
 
 
-def events_ingested(
-    logger: logging.Logger, modular_input_name: str, sourcetype: str, n_events: int
+def _base_error_log(
+    logger,
+    exc: Exception,
+    exe_label,
+    full_msg: bool = True,
+    msg_before: str = None,
+    msg_after: str = None,
 ):
-    """Specific function to log the number of events ingested."""
-    log_event(
+    log_exception(
         logger,
-        {
-            "action": "events_ingested",
-            "modular_input_name": modular_input_name,
-            "sourcetype_ingested": sourcetype,
-            "n_events": n_events,
-        },
+        exc,
+        exc_label=exe_label,
+        full_msg=full_msg,
+        msg_before=msg_before,
+        msg_after=msg_after,
     )
+
+
+log_connection_error = partial(_base_error_log, exe_label="Connection Error")
+log_configuration_error = partial(_base_error_log, exe_label="Configuration Error")
+log_permission_error = partial(_base_error_log, exe_label="Permission Error")
+log_authentication_error = partial(_base_error_log, exe_label="Authentication Error")
+log_server_error = partial(_base_error_log, exe_label="Server Error")
+
+
+def events_ingested(
+    logger: logging.Logger,
+    modular_input_name: str,
+    sourcetype: str,
+    n_events: int,
+    index: str,
+    account: str = None,
+    host: str = None,
+    license_usage_source: str = None,
+):
+    """Specific function to log the basic information of events ingested for
+    the monitoring dashboard.
+
+    Arguments:
+        logger: Add-on logger.
+        modular_input_name: Full name of the modular input. It needs to be in a format `<input_type>://<input_name>`.
+            In case of invalid format ValueError is raised.
+        sourcetype: Source type used to write event.
+        n_events: Number of ingested events.
+        index: Index used to write event.
+        license_usage_source: source used to match data with license_usage.log.
+        account: Account used to write event. (optional)
+        host: Host used to write event. (optional)
+    """
+
+    if "://" in modular_input_name:
+        input_name = modular_input_name.split("/")[-1]
+    else:
+        raise ValueError(
+            f"Invalid modular input name: {modular_input_name}. "
+            f"It should be in format <input_type>://<input_name>"
+        )
+
+    result = {
+        "action": "events_ingested",
+        "modular_input_name": license_usage_source
+        if license_usage_source
+        else modular_input_name,
+        "sourcetype_ingested": sourcetype,
+        "n_events": n_events,
+        "event_input": input_name,
+        "event_index": index,
+    }
+
+    if account:
+        result["event_account"] = account
+
+    if host:
+        result["event_host"] = host
+
+    log_event(logger, result)
 
 
 def log_exception(
     logger: logging.Logger,
     e: Exception,
+    exc_label: str,
     full_msg: bool = True,
     msg_before: str = None,
     msg_after: str = None,
     log_level: int = logging.ERROR,
 ):
-    """General function to log exceptions."""
+    """General function to log exceptions.
+
+    Arguments:
+        logger: Add-on logger.
+        e: Exception to log.
+        exc_label: label for the error to categorize it.
+        full_msg: if set to True, full traceback will be logged. Default: True
+        msg_before: custom message before exception traceback. Default: None
+        msg_after: custom message after exception traceback. Default: None
+        log_level: Log level to log exception. Default: ERROR.
+    """
+
+    msg = _get_exception_message(e, full_msg, msg_before, msg_after)
+    logger.log(log_level, f'exc_l="{exc_label}" {msg}')
+
+
+def _get_exception_message(
+    e: Exception,
+    full_msg: bool = True,
+    msg_before: str = None,
+    msg_after: str = None,
+) -> str:
     exc_type, exc_value, exc_traceback = type(e), e, e.__traceback__
     if full_msg:
         error = traceback.format_exception(exc_type, exc_value, exc_traceback)
@@ -284,5 +370,4 @@ def log_exception(
     msg_start = msg_before if msg_before is not None else ""
     msg_mid = "".join(error)
     msg_end = msg_after if msg_after is not None else ""
-    msg = f"{msg_start}\n{msg_mid}\n{msg_end}"
-    logger.log(log_level, msg)
+    return f"{msg_start}\n{msg_mid}\n{msg_end}"

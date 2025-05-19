@@ -6,7 +6,6 @@ Home-page: https://jsl.readthedocs.org
 Author: Anton Romanovich
 Author-email: anthony.romanovich@gmail.com
 License: BSD
-Platform: UNKNOWN
 Classifier: Development Status :: 4 - Beta
 Classifier: Intended Audience :: Developers
 Classifier: License :: OSI Approved :: BSD License
@@ -122,5 +121,3 @@ License
 .. _GitHub: https://github.com/aromanovich/jsl
 .. _PyPI: https://pypi.python.org/pypi/jsl
 .. _BSD license: https://github.com/aromanovich/jsl/blob/master/LICENSE
-
-

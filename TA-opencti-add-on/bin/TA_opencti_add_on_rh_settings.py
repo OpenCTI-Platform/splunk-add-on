@@ -94,18 +94,19 @@ model_logging = RestModel(fields_logging, name='logging')
 fields_additional_parameters = [
     field.RestField(
         'opencti_url',
-        required=True,
+        required=False,
         encrypted=False,
-        default=None,
-        validator=validator.Pattern(
-            regex=r"""^https://[0-9a-zA-Z\-\.]+(?:\:\d+)?""",
+        default='',
+        validator=validator.String(
+            min_len=0, 
+            max_len=8192, 
         )
     ), 
     field.RestField(
-        'opencti_api_key',
-        required=True,
+        'opencti_token',
+        required=False,
         encrypted=True,
-        default=None,
+        default='',
         validator=validator.String(
             min_len=0, 
             max_len=8192, 

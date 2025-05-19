@@ -1,11 +1,11 @@
 {
   "schemaVersion": "2.0.0",
   "info": {
-    "title": "OpenCTI Add-on for Splunk",
+    "title": "OpenCTI Add-on",
     "id": {
       "group": null,
       "name": "TA-opencti-add-on",
-      "version": "1.1.5"
+      "version": "2.0.0"
     },
     "author": [
       {
@@ -15,7 +15,7 @@
       }
     ],
     "releaseDate": null,
-    "description": "Add-on for OpenCTI",
+    "description": "Splunk Add-on for OpenCTI",
     "classification": {
       "intendedAudience": null,
       "categories": [],
@@ -34,18 +34,27 @@
     },
     "releaseNotes": {
       "name": null,
-      "text": "./README.txt",
+      "text": null,
       "uri": null
     }
   },
-  "dependencies": null,
-  "tasks": null,
-  "inputGroups": null,
-  "incompatibleApps": null,
-  "platformRequirements": null,
+  "dependencies": {
+  },
+  "tasks": [],
+  "inputGroups": {
+  },
+  "incompatibleApps": {
+  },
+  "platformRequirements": {
+    "splunk": {
+      "Enterprise": "*"
+    }
+  },
   "supportedDeployments": [
-    "_standalone",
-    "_distributed"
+    "*"
   ],
-  "targetWorkloads": null
+  "targetWorkloads": [
+    "_search_heads",
+    "_forwarders"
+  ]
 }

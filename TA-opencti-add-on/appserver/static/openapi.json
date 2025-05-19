@@ -2,10 +2,11 @@
     "openapi": "3.0.0",
     "info": {
         "title": "TA-opencti-add-on",
-        "version": "1.1.5",
+        "version": "0.0.0+b646b46",
         "description": "OpenCTI Add-on",
         "contact": {
-            "name": "Filigran"
+            "name": "Filigran",
+            "email": "contact@filigran.io"
         }
     },
     "servers": [
@@ -124,7 +125,7 @@
                     "opencti_url": {
                         "type": "string"
                     },
-                    "opencti_api_key": {
+                    "opencti_token": {
                         "type": "string",
                         "format": "password"
                     }
@@ -136,13 +137,13 @@
                     "opencti_url": {
                         "type": "string"
                     },
-                    "opencti_api_key": {
+                    "opencti_token": {
                         "type": "string",
                         "format": "password"
                     }
                 }
             },
-            "opencti_indicators": {
+            "opencti_stream": {
                 "type": "object",
                 "properties": {
                     "name": {
@@ -160,6 +161,13 @@
                     "import_from": {
                         "type": "string"
                     },
+                    "input_type": {
+                        "type": "string",
+                        "enum": [
+                            "kvstore",
+                            "index"
+                        ]
+                    },
                     "disabled": {
                         "type": "string",
                         "enum": [
@@ -169,7 +177,7 @@
                     }
                 }
             },
-            "opencti_indicators_without_name": {
+            "opencti_stream_without_name": {
                 "type": "object",
                 "properties": {
                     "interval": {
@@ -184,6 +192,13 @@
                     "import_from": {
                         "type": "string"
                     },
+                    "input_type": {
+                        "type": "string",
+                        "enum": [
+                            "kvstore",
+                            "index"
+                        ]
+                    },
                     "disabled": {
                         "type": "string",
                         "enum": [
@@ -193,7 +208,7 @@
                     }
                 }
             },
-            "opencti_indicators_without_disabled": {
+            "opencti_stream_without_disabled": {
                 "type": "object",
                 "properties": {
                     "name": {
@@ -210,6 +225,13 @@
                     },
                     "import_from": {
                         "type": "string"
+                    },
+                    "input_type": {
+                        "type": "string",
+                        "enum": [
+                            "kvstore",
+                            "index"
+                        ]
                     }
                 }
             }
@@ -495,11 +517,11 @@
                 }
             ]
         },
-        "/TA_opencti_add_on_opencti_indicators": {
+        "/TA_opencti_add_on_opencti_stream": {
             "get": {
                 "responses": {
                     "200": {
-                        "description": "Get list of items for opencti_indicators",
+                        "description": "Get list of items for opencti_stream",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -514,7 +536,7 @@
                                                         "type": "string"
                                                     },
                                                     "content": {
-                                                        "$ref": "#/components/schemas/opencti_indicators_without_name"
+                                                        "$ref": "#/components/schemas/opencti_stream_without_name"
                                                     }
                                                 }
                                             }
@@ -525,13 +547,13 @@
                         }
                     }
                 },
-                "description": "Get list of items for opencti_indicators",
+                "description": "Get list of items for opencti_stream",
                 "deprecated": false
             },
             "post": {
                 "responses": {
                     "200": {
-                        "description": "Create item in opencti_indicators",
+                        "description": "Create item in opencti_stream",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -546,7 +568,7 @@
                                                         "type": "string"
                                                     },
                                                     "content": {
-                                                        "$ref": "#/components/schemas/opencti_indicators_without_name"
+                                                        "$ref": "#/components/schemas/opencti_stream_without_name"
                                                     }
                                                 }
                                             }
@@ -557,12 +579,12 @@
                         }
                     }
                 },
-                "description": "Create item in opencti_indicators",
+                "description": "Create item in opencti_stream",
                 "requestBody": {
                     "content": {
                         "application/x-www-form-urlencoded": {
                             "schema": {
-                                "$ref": "#/components/schemas/opencti_indicators_without_disabled"
+                                "$ref": "#/components/schemas/opencti_stream_without_disabled"
                             }
                         }
                     },
@@ -586,11 +608,11 @@
                 }
             ]
         },
-        "/TA_opencti_add_on_opencti_indicators/{name}": {
+        "/TA_opencti_add_on_opencti_stream/{name}": {
             "get": {
                 "responses": {
                     "200": {
-                        "description": "Get opencti_indicators item details",
+                        "description": "Get opencti_stream item details",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -605,7 +627,7 @@
                                                         "type": "string"
                                                     },
                                                     "content": {
-                                                        "$ref": "#/components/schemas/opencti_indicators_without_name"
+                                                        "$ref": "#/components/schemas/opencti_stream_without_name"
                                                     }
                                                 }
                                             }
@@ -616,13 +638,13 @@
                         }
                     }
                 },
-                "description": "Get opencti_indicators item details",
+                "description": "Get opencti_stream item details",
                 "deprecated": false
             },
             "post": {
                 "responses": {
                     "200": {
-                        "description": "Update opencti_indicators item",
+                        "description": "Update opencti_stream item",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -637,7 +659,7 @@
                                                         "type": "string"
                                                     },
                                                     "content": {
-                                                        "$ref": "#/components/schemas/opencti_indicators_without_name"
+                                                        "$ref": "#/components/schemas/opencti_stream_without_name"
                                                     }
                                                 }
                                             }
@@ -648,12 +670,12 @@
                         }
                     }
                 },
-                "description": "Update opencti_indicators item",
+                "description": "Update opencti_stream item",
                 "requestBody": {
                     "content": {
                         "application/x-www-form-urlencoded": {
                             "schema": {
-                                "$ref": "#/components/schemas/opencti_indicators_without_name"
+                                "$ref": "#/components/schemas/opencti_stream_without_name"
                             }
                         }
                     },
@@ -664,7 +686,7 @@
             "delete": {
                 "responses": {
                     "200": {
-                        "description": "Delete opencti_indicators item",
+                        "description": "Delete opencti_stream item",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -679,7 +701,7 @@
                                                         "type": "string"
                                                     },
                                                     "content": {
-                                                        "$ref": "#/components/schemas/opencti_indicators_without_name"
+                                                        "$ref": "#/components/schemas/opencti_stream_without_name"
                                                     }
                                                 }
                                             }
@@ -690,7 +712,7 @@
                         }
                     }
                 },
-                "description": "Delete opencti_indicators item",
+                "description": "Delete opencti_stream item",
                 "deprecated": false
             },
             "parameters": [

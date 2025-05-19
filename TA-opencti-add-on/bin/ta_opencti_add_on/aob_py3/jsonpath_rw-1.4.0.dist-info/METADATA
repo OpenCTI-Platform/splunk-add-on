@@ -6,7 +6,6 @@ Home-page: https://github.com/kennknowles/python-jsonpath-rw
 Author: Kenneth Knowles
 Author-email: kenn.knowles@gmail.com
 License: Apache 2.0
-Platform: UNKNOWN
 Classifier: Development Status :: 5 - Production/Stable
 Classifier: Intended Audience :: Developers
 Classifier: License :: OSI Approved :: Apache Software License
@@ -244,5 +243,3 @@ limitations under the License.
    :target: https://pypi.python.org/pypi/jsonpath-rw
 .. |PyPi downloads| image:: https://pypip.in/d/jsonpath-rw/badge.png
    :target: https://pypi.python.org/pypi/jsonpath-rw
-
-

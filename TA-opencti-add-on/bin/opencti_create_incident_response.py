@@ -9,16 +9,12 @@ import sys
 from alert_actions_base import ModularAlertBase
 import modalert_opencti_create_incident_response_helper
 
-class AlertActionWorkercreate_incident_response(ModularAlertBase):
+class AlertActionWorkeropencti_create_incident_response(ModularAlertBase):
 
     def __init__(self, ta_name, alert_name):
-        super(AlertActionWorkercreate_incident_response, self).__init__(ta_name, alert_name)
+        super(AlertActionWorkeropencti_create_incident_response, self).__init__(ta_name, alert_name)
 
     def validate_params(self):
-
-        if not self.get_param("name"):
-            self.log_error('name is a mandatory parameter, but its value is None.')
-            return False
         return True
 
     def process_event(self, *args, **kwargs):
@@ -41,5 +37,5 @@ class AlertActionWorkercreate_incident_response(ModularAlertBase):
         return status
 
 if __name__ == "__main__":
-    exitcode = AlertActionWorkercreate_incident_response("TA-opencti-add-on", "opencti_create_incident_response").run(sys.argv)
+    exitcode = AlertActionWorkeropencti_create_incident_response("TA-opencti-add-on", "opencti_create_incident_response").run(sys.argv)
     sys.exit(exitcode)

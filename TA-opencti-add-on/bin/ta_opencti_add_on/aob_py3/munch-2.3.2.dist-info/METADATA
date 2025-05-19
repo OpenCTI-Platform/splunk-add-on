@@ -7,7 +7,6 @@ Author: Rotem Yaari
 Author-email: vmalloc@gmail.com
 License: MIT
 Keywords: munch,dict,mapping,container,collection
-Platform: UNKNOWN
 Classifier: Development Status :: 5 - Production/Stable
 Classifier: Intended Audience :: Developers
 Classifier: Operating System :: OS Independent
@@ -21,6 +20,4 @@ Classifier: Topic :: Utilities
 Classifier: License :: OSI Approved :: MIT License
 License-File: LICENSE.txt
 Requires-Dist: six
-
-UNKNOWN
 

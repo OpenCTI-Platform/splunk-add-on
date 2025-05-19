@@ -30,7 +30,7 @@ def splunkd_request(
     method="GET",
     headers=None,
     data=None,
-    timeout=30,
+    timeout=300,
     retry=1,
     verify=False,
 ) -> Optional[requests.Response]:

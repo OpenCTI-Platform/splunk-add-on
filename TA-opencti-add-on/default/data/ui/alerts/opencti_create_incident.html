@@ -1,1 +1,47 @@
-<form class="form-horizontal form-complex">    <div class="control-group">        <label class="control-label" for="opencti_create_incident_name">Name <span class="required">*</span> </label>        <div class="controls">            <input type="text" name="action.opencti_create_incident.param.name" id="opencti_create_incident_name"/>        </div>    </div>    <div class="control-group">        <label class="control-label" for="opencti_create_incident_description">Description  </label>        <div class="controls">            <input type="text" name="action.opencti_create_incident.param.description" id="opencti_create_incident_description"/>        </div>    </div>    <div class="control-group">        <label class="control-label" for="opencti_create_incident_type">Type </label>        <div class="controls">            <input type="text" name="action.opencti_create_incident.param.type" id="opencti_create_incident_type"/>        </div>    </div>    <div class="control-group">        <label class="control-label" for="opencti_create_incident_severity">Severity </label>        <div class="controls">            <select name="action.opencti_create_incident.param.severity" id="opencti_create_incident_severity">                <option value="low">Low</option>                <option value="medium">Medium</option>                <option value="high">High</option>                <option value="critical">Critical</option>            </select>        </div>    </div>    <div class="control-group">        <label class="control-label" for="opencti_create_incident_labels">Labels  </label>        <div class="controls">            <input type="text" name="action.opencti_create_incident.param.labels" id="opencti_create_incident_labels"/>        </div>    </div>    <div class="control-group">        <label class="control-label" for="opencti_create_incident_tlp">TLP  </label>        <div class="controls">            <select name="action.opencti_create_incident.param.tlp" id="opencti_create_incident_tlp">                <option value="tlp_clear">TLP:CLEAR</option>                <option value="tlp_green">TLP:GREEN</option>                <option value="tlp_amber">TLP:AMBER</option>                <option value="tlp_red">TLP_RED</option>            </select>        </div>    </div>    <div class="control-group">        <label class="control-label" for="opencti_create_incident_observables_extraction">Observables extraction <span class="required">*</span> </label>        <div class="controls">            <select name="action.opencti_create_incident.param.observables_extraction" id="opencti_create_incident_observables_extraction">                <option value="disable">Disable</option>                <option value="cim_model">CIM model</option>                <option value="field_mapping">Field mapping</option>            </select>            <span class="help-block">                Enable extraction of observables            </span>        </div>    </div></form>
+<form class="form-horizontal form-complex">
+<div class="control-group">
+	<label class="control-label" for="opencti_create_incident_name">Name  </label>
+    <div class="controls">
+	<input type="text" name="action.opencti_create_incident.param.name" id="opencti_create_incident_name"/>
+    </div>
+</div>
+<div class="control-group">
+	<label class="control-label" for="opencti_create_incident_description">Description  </label>
+    <div class="controls">
+	<input type="text" name="action.opencti_create_incident.param.description" id="opencti_create_incident_description"/>
+    </div>
+</div>
+<div class="control-group">
+	<label class="control-label" for="opencti_create_incident_type">Type  </label>
+    <div class="controls">
+	<input type="text" name="action.opencti_create_incident.param.type" id="opencti_create_incident_type"/>
+    </div>
+</div>
+<div class="control-group">
+	<label class="control-label" for="opencti_create_incident_severity">Severity  </label>
+    <div class="controls">
+	<input type="text" name="action.opencti_create_incident.param.severity" id="opencti_create_incident_severity"/>
+    </div>
+</div>
+<div class="control-group">
+	<label class="control-label" for="opencti_create_incident_labels">Labels  </label>
+    <div class="controls">
+	<input type="text" name="action.opencti_create_incident.param.labels" id="opencti_create_incident_labels"/>
+    </div>
+</div>
+<div class="control-group">
+	<label class="control-label" for="opencti_create_incident_tlp">TLP  </label>
+    <div class="controls">
+	<input type="text" name="action.opencti_create_incident.param.tlp" id="opencti_create_incident_tlp"/>
+    </div>
+</div>
+<div class="control-group">
+	<label class="control-label" for="opencti_create_incident_observable_extraction">Observable Extraction  </label>
+    <div class="controls">
+<select name="action.opencti_create_incident.param.observable_extraction" id="opencti_create_incident_observable_extraction">
+        <option value="enable">Enable</option>
+        <option value="disable">Disable</option>
+</select>
+    </div>
+</div>
+</form>
