@@ -166,8 +166,8 @@
                             ]
                         },
                         {
-                            "field": "opencti_token",
-                            "label": "OpenCTI Token",
+                            "field": "opencti_api_key",
+                            "label": "OpenCTI API Key",
                             "type": "text",
                             "help": "Enter your OpenCTI API token. This is used to authenticate and access the OpenCTI platform.",
                             "required": false,

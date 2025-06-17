@@ -125,7 +125,7 @@
                     "opencti_url": {
                         "type": "string"
                     },
-                    "opencti_token": {
+                    "opencti_api_key": {
                         "type": "string",
                         "format": "password"
                     }
@@ -137,7 +137,7 @@
                     "opencti_url": {
                         "type": "string"
                     },
-                    "opencti_token": {
+                    "opencti_api_key": {
                         "type": "string",
                         "format": "password"
                     }

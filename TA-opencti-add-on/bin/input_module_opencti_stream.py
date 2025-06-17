@@ -169,7 +169,7 @@ def collect_events(helper, ew):
 
     proxies = get_proxy_config(helper)
     opencti_url = helper.get_global_setting("opencti_url")
-    opencti_token = helper.get_global_setting("opencti_token")
+    opencti_token = helper.get_global_setting("opencti_api_key")
     #
     # Reset Checkpoint
     #

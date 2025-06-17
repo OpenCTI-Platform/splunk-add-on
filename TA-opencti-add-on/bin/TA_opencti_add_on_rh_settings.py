@@ -103,7 +103,7 @@ fields_additional_parameters = [
         )
     ), 
     field.RestField(
-        'opencti_token',
+        'opencti_api_key',
         required=False,
         encrypted=True,
         default='',

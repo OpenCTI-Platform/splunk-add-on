@@ -12,4 +12,4 @@ loglevel =
 
 [additional_parameters]
 opencti_url = 
-opencti_token = 
+opencti_api_key = 
