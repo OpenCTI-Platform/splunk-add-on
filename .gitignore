@@ -6,3 +6,5 @@ local.meta
 
 # Splunk local folder
 local
+.DS_Store
+.gitignore

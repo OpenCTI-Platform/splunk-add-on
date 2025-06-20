@@ -271,10 +271,22 @@ def collect_events(helper, ew):
                     continue
 
             elif input_type == "index":
+                # Set event_time from updated_at, if available and parseable
+                event_time = parsed_stix.get("updated_at")
+                if event_time:
+                    try:
+                        event_time = datetime.strptime(
+                            event_time, "%Y-%m-%dT%H:%M:%S.%fZ"
+                        ).timestamp()
+                    except ValueError:
+                        helper.log_warning(
+                            f"Unable to parse updated_at timestamp: {event_time}"
+                        )
+                        event_time = None
                 ew.write_event(
                     helper.new_event(
                         json.dumps(parsed_stix),
-                        time=None,
+                        time=event_time,
                         host=None,
                         index=target_index,
                         source="opencti",
