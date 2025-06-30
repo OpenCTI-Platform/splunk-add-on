@@ -165,7 +165,7 @@ def collect_events(helper, ew):
     target_index = helper.get_arg("index")
 
     helper.log_info(f"Selected input type: {input_type}")
-    helper.log_info(f"Fetching data from OpenCTI stream.id: {stream_id}")
+    helper.log_info(f"Fetching data from OpenCTI stream id: {stream_id}")
 
     proxies = get_proxy_config(helper)
     opencti_url = helper.get_global_setting("opencti_url")
@@ -173,8 +173,8 @@ def collect_events(helper, ew):
     #
     # Reset Checkpoint
     #
-    helper.delete_check_point(helper.get_input_stanza_names())
-    helper.log_warning("Checkpoint Reset")
+    # helper.delete_check_point(helper.get_input_stanza_names())
+    # helper.log_warning("Checkpoint Reset")
     #
     #
     state = helper.get_check_point(input_name)
@@ -275,21 +275,6 @@ def collect_events(helper, ew):
             elif input_type == "index":
                 # Robust event_time parsing from updated_at, created_at, or first_seen
                 event_time = datetime.now(timezone.utc).timestamp()
-                # for time_field in ["updated_at", "created_at", "first_seen"]:
-                #     try:
-                #         event_str = parsed_stix.get(time_field)
-                #         if event_str:
-                #             # Handle with or without milliseconds
-                #             if "." in event_str:
-                #                 fmt = "%Y-%m-%dT%H:%M:%S.%fZ"
-                #             else:
-                #                 fmt = "%Y-%m-%dT%H:%M:%SZ"
-                #             event_time = datetime.strptime(event_str, fmt).timestamp()
-                #             break
-                #     except Exception as e:
-                #         helper.log_warning(
-                #             f"Could not parse {time_field}: {event_str} ({e})"
-                #         )
                 ew.write_event(
                     helper.new_event(
                         json.dumps(parsed_stix),
@@ -307,6 +292,7 @@ def collect_events(helper, ew):
                 continue
 
             state["start_from"] = msg.id
+            helper.log_info(f"[state] {state}")
             helper.save_check_point(input_name, json.dumps(state))
 
     except Exception as ex:
