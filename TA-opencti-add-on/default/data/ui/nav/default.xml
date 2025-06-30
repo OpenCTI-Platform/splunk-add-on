@@ -1,5 +1,8 @@
-<nav search_view="search" color="#001BDA">
-<view name="inputs" default="true" />
+<nav search_view="search" color="#297ba5">
+<view name="inputs"/>
 <view name="configuration"/>
 <view name="search" label="Search"/>
+<view name="alerts" label="Alerts"/>
+<view name="indicators_dashboard" label="Indicators Dashboard" default="true"/>
+<!--<view name="logs_dashboard" label="App Logs"/>-->
 </nav>

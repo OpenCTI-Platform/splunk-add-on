@@ -249,7 +249,9 @@ def collect_events(helper, ew):
                 continue
 
             key = sanitize_key(data.get("id", parsed_stix.get("_key", msg.id)))
-            helper.log_debug(f"Key: {key}")
+            indicator_value = data.get("value")
+            helper.log_info(f"Processing {indicator_value}")
+            helper.log_debug(f"{data}")
             if (
                 input_type == "kvstore"
                 and entity_type == "indicator"
@@ -271,18 +273,23 @@ def collect_events(helper, ew):
                     continue
 
             elif input_type == "index":
-                # Set event_time from updated_at, if available and parseable
-                event_time = parsed_stix.get("updated_at")
-                if event_time:
-                    try:
-                        event_time = datetime.strptime(
-                            event_time, "%Y-%m-%dT%H:%M:%S.%fZ"
-                        ).timestamp()
-                    except ValueError:
-                        helper.log_warning(
-                            f"Unable to parse updated_at timestamp: {event_time}"
-                        )
-                        event_time = None
+                # Robust event_time parsing from updated_at, created_at, or first_seen
+                event_time = datetime.now(timezone.utc).timestamp()
+                # for time_field in ["updated_at", "created_at", "first_seen"]:
+                #     try:
+                #         event_str = parsed_stix.get(time_field)
+                #         if event_str:
+                #             # Handle with or without milliseconds
+                #             if "." in event_str:
+                #                 fmt = "%Y-%m-%dT%H:%M:%S.%fZ"
+                #             else:
+                #                 fmt = "%Y-%m-%dT%H:%M:%SZ"
+                #             event_time = datetime.strptime(event_str, fmt).timestamp()
+                #             break
+                #     except Exception as e:
+                #         helper.log_warning(
+                #             f"Could not parse {time_field}: {event_str} ({e})"
+                #         )
                 ew.write_event(
                     helper.new_event(
                         json.dumps(parsed_stix),
