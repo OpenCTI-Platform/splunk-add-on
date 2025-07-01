@@ -280,7 +280,7 @@ def collect_events(helper, ew):
                     continue
 
                 key = sanitize_key(data.get("id", parsed_stix.get("_key", msg.id)))
-                indicator_value = data.get("value")
+                indicator_value = parsed_stix.get("value", "unknown")
                 helper.log_info(
                     f'type=stream input_name={input_name} message="Processing indicator value" value="{indicator_value}"'
                 )
@@ -336,7 +336,7 @@ def collect_events(helper, ew):
 
                 state["start_from"] = msg.id
                 helper.log_info(
-                    f"type=state input_name={input_name} stream_point={msg.id}"
+                    f'type=state input_name={input_name} message="Checkpoint updated" stream_point={msg.id} recover_until="{state.get("recover_until", "")}"'
                 )
                 helper.save_check_point(input_name, json.dumps(state))
             except Exception as ex:
