@@ -157,15 +157,20 @@ def enrich_generic_payload(splunk_helper, payload, msg_event):
 
 def collect_events(helper, ew):
     helper.set_log_level(helper.log_level)
-    helper.log_info("OpenCTI data input module start")
-
     input_name = helper.get_input_stanza_names()
     input_type = helper.get_arg("input_type").strip().lower()
     stream_id = helper.get_arg("stream_id")
     target_index = helper.get_arg("index")
 
-    helper.log_info(f"Selected input type: {input_type}")
-    helper.log_info(f"Fetching data from OpenCTI stream id: {stream_id}")
+    helper.log_info(
+        f'type=stream input_name={input_name} message="OpenCTI data input module started"'
+    )
+    helper.log_info(
+        f'type=stream input_name={input_name} input_type={input_type} message="Selected input type"'
+    )
+    helper.log_info(
+        f'type=stream input_name={input_name} stream_id={stream_id} message="Fetching data from OpenCTI"'
+    )
 
     proxies = get_proxy_config(helper)
     opencti_url = helper.get_global_setting("opencti_url")
@@ -179,6 +184,9 @@ def collect_events(helper, ew):
     #
     state = helper.get_check_point(input_name)
     if state is None:
+        helper.log_info(
+            f'type=state input_name={input_name} message="No checkpoint found, initializing new state"'
+        )
         import_from = helper.get_arg("import_from")
         recover_until = datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ")
         start_date = datetime.utcnow() - timedelta(days=int(import_from))
@@ -187,17 +195,31 @@ def collect_events(helper, ew):
             "start_from": str(start_timestamp) + "-0",
             "recover_until": recover_until,
         }
-        helper.log_info(f"Initialized checkpoint state: {state}")
+        helper.log_info(
+            f'type=state input_name={input_name} message="Initialized new checkpoint state" state={state}'
+        )
     else:
         state = json.loads(state)
+        helper.log_info(
+            f'type=state input_name={input_name} message="Checkpoint state parsed" state={state}'
+        )
 
-    live_stream_url = f"{opencti_url}/stream/{stream_id}"
     if "recover_until" in state:
-        live_stream_url += f"?recover={state['recover_until']}"
+        live_stream_url = (
+            opencti_url
+            + "/stream/"
+            + stream_id
+            + "?recover="
+            + state.get("recover_until")
+        )
+    else:
+        live_stream_url = opencti_url + "/stream/" + stream_id
     helper.log_debug(f"Live stream URL: {live_stream_url}")
 
     kvstore = None
-    helper.log_debug(f"Input Type: {input_type}")
+    helper.log_info(
+        f'type=stream input_name={input_name} input_type={input_type} message="Processing input type"'
+    )
     if input_type == "kvstore":
         try:
             helper.log_debug("Initializing KV Store")
@@ -226,75 +248,104 @@ def collect_events(helper, ew):
         )
 
         for msg in messages:
-            if msg.event not in ["create", "update", "delete"]:
-                continue
-
-            message_payload = json.loads(msg.data)
-            data = message_payload.get("data", {})
-            entity_type = data.get("type")
-
-            if entity_type == "identity":
-                IDENTITY_DEFs[data["id"]] = data.get("name", "Unknown")
-            elif entity_type == "marking-definition":
-                MARKING_DEFs[data["id"]] = data.get("name", "Unknown")
-
-            parsed_stix = None
-            if entity_type == "indicator" and data.get("pattern_type") == "stix":
-                parsed_stix = enrich_payload(helper, data, msg.event)
-            else:
-                parsed_stix = enrich_generic_payload(helper, data, msg.event)
-
-            if parsed_stix is None:
-                helper.log_error(f"Could not enrich data for msg {msg.id}")
-                continue
-
-            key = sanitize_key(data.get("id", parsed_stix.get("_key", msg.id)))
-            indicator_value = data.get("value")
-            helper.log_info(f"Processing {indicator_value}")
-            helper.log_debug(f"{data}")
-            if (
-                input_type == "kvstore"
-                and entity_type == "indicator"
-                and data.get("pattern_type") == "stix"
-            ):
-                try:
-                    if msg.event == "delete":
-                        if exist_in_kvstore(kvstore, key):
-                            kvstore.data.delete_by_id(parsed_stix["_key"])
-                            helper.log_info(f"KV Store: Deleted {key}")
-                    else:
-                        parsed_stix["added_at"] = datetime.now(timezone.utc).strftime(
-                            "%Y-%m-%dT%H:%M:%SZ"
-                        )
-                        kvstore.batch_save(*[parsed_stix])
-                        helper.log_info(f"KV Store: Inserted {key}")
-                except Exception as kv_ex:
-                    helper.log_error(f"KV Store operation failed: {kv_ex}")
+            try:
+                if msg.event not in ["create", "update", "delete"]:
                     continue
 
-            elif input_type == "index":
-                # Robust event_time parsing from updated_at, created_at, or first_seen
-                event_time = datetime.now(timezone.utc).timestamp()
-                ew.write_event(
-                    helper.new_event(
-                        json.dumps(parsed_stix),
-                        time=event_time,
-                        host=None,
-                        index=target_index,
-                        source="opencti",
-                        sourcetype=f"opencti:{entity_type}",
-                        done=True,
-                        unbroken=True,
-                    )
-                )
-            else:
-                helper.log_warning(f"Unknown input_type: {input_type}")
-                continue
+                message_payload = json.loads(msg.data)
+                data = message_payload.get("data", {})
+                entity_type = data.get("type")
 
-            state["start_from"] = msg.id
-            helper.log_info(f"[state] {state}")
-            helper.save_check_point(input_name, json.dumps(state))
+                if entity_type == "identity":
+                    IDENTITY_DEFs[data["id"]] = data.get("name", "Unknown")
+                elif entity_type == "marking-definition":
+                    MARKING_DEFs[data["id"]] = data.get("name", "Unknown")
+
+                parsed_stix = None
+                if entity_type == "indicator" and data.get("pattern_type") == "stix":
+                    parsed_stix = enrich_payload(helper, data, msg.event)
+                    if parsed_stix is not None:
+                        helper.log_info(
+                            f'type=stream input_name={input_name} message="Processing indicator" event={msg.event} id={msg.id} name="{parsed_stix["name"]}" pattern="{parsed_stix["pattern"]}"'
+                        )
+                else:
+                    parsed_stix = enrich_generic_payload(helper, data, msg.event)
+                    if parsed_stix is not None:
+                        helper.log_info(
+                            f'type=stream input_name={input_name} message="Processing {data["type"]}" event={msg.event} id={msg.id} name="{data["name"]}"'
+                        )
+
+                if parsed_stix is None:
+                    helper.log_error(f"Could not enrich data for msg {msg.id}")
+                    continue
+
+                key = sanitize_key(data.get("id", parsed_stix.get("_key", msg.id)))
+                indicator_value = data.get("value")
+                helper.log_info(
+                    f'type=stream input_name={input_name} message="Processing indicator value" value="{indicator_value}"'
+                )
+                helper.log_debug(
+                    f'type=stream input_name={input_name} message="Raw event data" data="{data}"'
+                )
+                if (
+                    input_type == "kvstore"
+                    and entity_type == "indicator"
+                    and data.get("pattern_type") == "stix"
+                ):
+                    try:
+                        if msg.event == "delete":
+                            if exist_in_kvstore(kvstore, key):
+                                kvstore.data.delete_by_id(parsed_stix["_key"])
+                                helper.log_info(
+                                    f'type=kvstore input_name={input_name} message="Deleted indicator from KV Store" key="{key}"'
+                                )
+                        else:
+                            parsed_stix["added_at"] = datetime.now(
+                                timezone.utc
+                            ).strftime("%Y-%m-%dT%H:%M:%SZ")
+                            kvstore.batch_save(*[parsed_stix])
+                            helper.log_info(
+                                f'type=kvstore input_name={input_name} message="Inserted indicator into KV Store" key="{key}"'
+                            )
+                    except Exception as kv_ex:
+                        helper.log_error(
+                            f'type=kvstore input_name={input_name} message="KV Store operation failed" error="{kv_ex}"'
+                        )
+                        continue
+
+                elif input_type == "index":
+                    # Robust event_time parsing from updated_at, created_at, or first_seen
+                    event_time = datetime.now(timezone.utc).timestamp()
+                    ew.write_event(
+                        helper.new_event(
+                            json.dumps(parsed_stix),
+                            time=event_time,
+                            host=None,
+                            index=target_index,
+                            source="opencti",
+                            sourcetype=f"opencti:{entity_type}",
+                            done=True,
+                            unbroken=True,
+                        )
+                    )
+                else:
+                    helper.log_warning(
+                        f'type=stream input_name={input_name} message="Unknown input_type" input_type={input_type}'
+                    )
+                    continue
+
+                state["start_from"] = msg.id
+                helper.log_info(
+                    f"type=state input_name={input_name} stream_point={msg.id}"
+                )
+                helper.save_check_point(input_name, json.dumps(state))
+            except Exception as ex:
+                helper.log_debug(
+                    f'type=stream input_name={input_name} message="Error processing stream message" error="{ex}" msg_id="{msg.id}"'
+                )
 
     except Exception as ex:
-        helper.log_error(f"Error in stream processing loop: {ex}")
+        helper.log_error(
+            f'type=stream input_name={input_name} message="Stream processing loop failed" error="{ex}"'
+        )
         sys.excepthook(*sys.exc_info())
