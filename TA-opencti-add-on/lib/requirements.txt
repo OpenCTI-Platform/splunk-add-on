@@ -1,0 +1,8 @@
+splunk-sdk
+six
+stix2
+pycti
+stix2-patterns
+filigran_sseclient
+requests
+splunktaucclib==6.6.0

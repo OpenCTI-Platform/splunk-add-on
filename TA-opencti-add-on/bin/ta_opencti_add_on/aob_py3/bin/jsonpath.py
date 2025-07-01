@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/venv/bin/python3.7
 # -*- coding: utf-8 -*-
 import re
 import sys

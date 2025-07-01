@@ -218,14 +218,14 @@
 		"ds_PYxsaacd": {
 			"type": "ds.search",
 			"options": {
-				"query": "| inputlookup opencti_lookup | stats count"
+				"query": "| inputlookup opencti_indicators | stats count"
 			},
 			"name": "OpenCTI Indicators Count"
 		},
 		"ds_YI12Xgn7": {
 			"type": "ds.search",
 			"options": {
-				"query": "| inputlookup opencti_lookup | eval added_at = strptime(added_at, \"%Y-%m-%dT%H:%M:%SZ\") | eval _time = added_at | timechart count AS Count",
+				"query": "| inputlookup opencti_indicators | eval added_at = strptime(added_at, \"%Y-%m-%dT%H:%M:%SZ\") | eval _time = added_at | timechart count AS Count",
 				"queryParameters": {
 					"earliest": "$global_time.earliest$",
 					"latest": "$global_time.latest$"
@@ -236,7 +236,7 @@
 		"ds_hsDs3Q0C": {
 			"type": "ds.search",
 			"options": {
-				"query": "| inputlookup opencti_lookup | stats count by type",
+				"query": "| inputlookup opencti_indicators | stats count by type",
 				"queryParameters": {
 					"earliest": "$global_time.earliest$",
 					"latest": "$global_time.latest$"
@@ -247,7 +247,7 @@
 		"ds_Pm9AHvFu_ds_hsDs3Q0C": {
 			"type": "ds.search",
 			"options": {
-				"query": "| inputlookup opencti_lookup | stats count by indicator_types",
+				"query": "| inputlookup opencti_indicators | stats count by indicator_types",
 				"queryParameters": {
 					"earliest": "$global_time.earliest$",
 					"latest": "$global_time.latest$"
@@ -258,14 +258,14 @@
 		"ds_N5ccv7a7_ds_Pm9AHvFu_ds_hsDs3Q0C": {
 			"type": "ds.search",
 			"options": {
-				"query": "| inputlookup opencti_lookup | stats count by indicator_types"
+				"query": "| inputlookup opencti_indicators | stats count by indicator_types"
 			},
 			"name": "OpenCTI IOCs per indicator_type copy 1"
 		},
 		"ds_nbAJEARh_ds_Pm9AHvFu_ds_hsDs3Q0C": {
 			"type": "ds.search",
 			"options": {
-				"query": "| inputlookup opencti_lookup | stats count by score",
+				"query": "| inputlookup opencti_indicators | stats count by score",
 				"queryParameters": {
 					"earliest": "$global_time.earliest$",
 					"latest": "$global_time.latest$"
@@ -276,7 +276,7 @@
 		"ds_PA2GTclu_ds_hsDs3Q0C": {
 			"type": "ds.search",
 			"options": {
-				"query": "| inputlookup opencti_lookup | stats count by markings",
+				"query": "| inputlookup opencti_indicators | stats count by markings",
 				"queryParameters": {
 					"earliest": "$global_time.earliest$",
 					"latest": "$global_time.latest$"
@@ -287,7 +287,7 @@
 		"ds_tR29ZhaJ_ds_PA2GTclu_ds_hsDs3Q0C": {
 			"type": "ds.search",
 			"options": {
-				"query": "| inputlookup opencti_lookup | stats count by created_by",
+				"query": "| inputlookup opencti_indicators | stats count by created_by",
 				"queryParameters": {
 					"earliest": "$global_time.earliest$",
 					"latest": "$global_time.latest$"
@@ -298,7 +298,7 @@
 		"ds_R0rMZ4Ao": {
 			"type": "ds.search",
 			"options": {
-				"query": "| inputlookup opencti_lookup | stats count by labels",
+				"query": "| inputlookup opencti_indicators | stats count by labels",
 				"queryParameters": {
 					"earliest": "$global_time.earliest$",
 					"latest": "$global_time.latest$"
@@ -309,7 +309,7 @@
 		"ds_z5ZhhLJx_ds_PYxsaacd": {
 			"type": "ds.search",
 			"options": {
-				"query": "| inputlookup opencti_lookup | stats by revoked",
+				"query": "| inputlookup opencti_indicators | stats by revoked",
 				"queryParameters": {}
 			},
 			"name": "OpenCTI Indicators Revoked"

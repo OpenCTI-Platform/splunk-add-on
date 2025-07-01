@@ -1,24 +1,23 @@
 
-
 [opencti_create_incident]
 python.version = python3
-param.name = <string> Name. It's a required parameter. It's default value is $name$.
-param.description = <string> Description.  It's default value is $description$.
+param.name = <string> Name.
+param.description = <string> Description.
 param.type = <string> Type.
-param.severity = <list> Severity. It's default value is medium.
+param.severity = <string> Severity.
 param.labels = <string> Labels.
-param.tlp = <list> TLP.  It's default value is tlp_amber.
-param.observables_extraction = <list> Observables extraction. It's default value is disable.
+param.tlp = <string> TLP.  It's default value is tlp_amber.
+param.observable_extraction = <list> Observable Extraction.  It's default value is disable.
 
 [opencti_create_incident_response]
 python.version = python3
-param.name = <string> Name. It's a required parameter. It's default value is $name$.
-param.description = <string> Description.  It's default value is $description$.
-param.severity = <list> Severity.  It's default value is medium.
-param.priority = <list> Priority.  It's default value is p2.
+param.name = <string> Name.
+param.description = <string> Description.
+param.severity = <string> Severity.
+param.priority = <string> Priority.
 param.type = <string> Type.
 param.case_template = <string> Case Template.
 param.labels = <string> Labels.
-param.tlp = <list> TLP.  It's default value is tlp_amber.
-param.observables_extraction = <list> Observables extraction. It's default value is disable.
+param.tlp = <string> TLP.  It's default value is tlp_amber.
+param.observable_extraction = <list> Observable Extraction.  It's default value is disable.
 
