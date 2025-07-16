@@ -6,3 +6,6 @@ export = system
 [views]
 access = read : [ * ], write : [ admin ]
 export = none
+
+[inputs/opencti_indicators://*]
+export = system

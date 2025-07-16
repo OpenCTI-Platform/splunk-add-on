@@ -1,3 +1,9 @@
+[opencti_indicators://<name>]
+import_from = <integer>
+interval = <integer>
+stream_id = <uuid>
+disabled = <boolean>
+
 [opencti_stream://<name>]
 stream_id = OpenCTI Stream Id to consume
 import_from = The number of days to go back for the initial data collection. The start date is calculated on the basis of the current UTC time.
