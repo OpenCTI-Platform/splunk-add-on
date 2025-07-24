@@ -7,7 +7,7 @@ param.type = <string> Type.
 param.severity = <string> Severity.
 param.labels = <string> Labels.
 param.tlp = <string> TLP.  It's default value is tlp_amber.
-param.observable_extraction = <list> Observable Extraction.  It's default value is disable.
+param.observables_extraction = <list> Observable Extraction.  It's default value is disable.
 
 [opencti_create_incident_response]
 python.version = python3
@@ -19,5 +19,5 @@ param.type = <string> Type.
 param.case_template = <string> Case Template.
 param.labels = <string> Labels.
 param.tlp = <string> TLP.  It's default value is tlp_amber.
-param.observable_extraction = <list> Observable Extraction.  It's default value is disable.
+param.observables_extraction = <list> Observable Extraction.  It's default value is disable.
 
