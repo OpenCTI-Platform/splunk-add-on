@@ -158,7 +158,8 @@ def enrich_generic_payload(splunk_helper, payload, msg_event):
 def collect_events(helper, ew):
     helper.set_log_level(helper.log_level)
     input_name = helper.get_input_stanza_names()
-    input_type = helper.get_arg("input_type").strip().lower()
+    #input_type = helper.get_arg("input_type").strip().lower()
+    input_type = "kvstore"
     stream_id = helper.get_arg("stream_id")
     target_index = helper.get_arg("index")
 
