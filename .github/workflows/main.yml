@@ -1,0 +1,56 @@
+name: build-test-release
+
+on: push
+
+jobs:
+
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Create subfolder
+        run: mkdir my-package
+
+      - name: Install UCC
+        run: |
+          pip install splunk-add-on-ucc-framework
+          pip install splunk-packaging-toolkit
+
+      - name: Build an app using UCC
+        run: ucc-gen build --source TA-opencti-add-on
+
+      - name: Create tmp folder
+        run: mkdir app-dir
+
+      - name: Create package
+        run: ucc-gen package --path output/TA-opencti-add-on -o app-dir/
+
+      - name: Upload package
+        uses: actions/upload-artifact@v4
+        with:
+          name: my-package
+          path: app-dir/
+
+  run-appinspect-api:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/download-artifact@v4
+        with:
+          name: my-package
+          path: app-dir/
+      - name: appinspect-api
+        uses: splunk/appinspect-api-action@v3.0
+        with:
+          username: ${{ secrets.SPL_COM_USER }}
+          password: ${{ secrets.SPL_COM_PASSWORD }}
+          app_path: app-dir/
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: appinspect-api-html-report
+          path: AppInspect_response.html
