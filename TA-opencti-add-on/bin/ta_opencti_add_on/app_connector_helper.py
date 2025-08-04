@@ -81,6 +81,10 @@ class SplunkAppConnectorHelper:
             raise Exception(f"An exception occurred while registering Splunk App, "
                             f"received status code: {r.status_code}, exception: {r.content}")
 
+        if "errors" in r.json():
+            raise Exception(f"An exception occurred while registering Splunk App, "
+                            f"received status code: {r.status_code}, exception: {r.json()}")
+
     def send_stix_bundle(self, bundle):
         """
         :param bundle:
