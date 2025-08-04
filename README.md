@@ -18,12 +18,20 @@ The OpenCTI Add-on for Splunk allows users to interconnect Splunk with OpenCTI p
 
 ### Installing from file
 
-1. Download latest version of the Splunk App: [TA-opencti-add-on-1.1.5.tgz](https://github.com/OpenCTI-Platform/splunk-add-on/releases/download/1.1.5/TA-opencti-add-on-1.1.5.tgz)
+1. Download latest version of the Splunk App: [TA-opencti-add-on-2.0.0.tgz](https://github.com/OpenCTI-Platform/splunk-add-on/releases/download/1.1.5/TA-opencti-add-on-1.1.5.tgz)
 2. Log in to the Splunk Web UI and navigate to "Apps" and click on "Manage Apps"
 3. Click "Install app from file"
-4. Choose file and select the "TA-opencti-add-on-1.1.5.tgz" file
+4. Choose file and select the "TA-opencti-add-on-2.0.0.tgz" file
 5. Click on Upload
    The app is installed
+
+## Upgrade from version 1.x.x
+
+During the upgrade from version 1.x.x to version 2.0.0 of the Splunk App, previously configured "Inputs" may not display correctly due to a caching issue at the browser level. 
+To resolve this problem, you need to "bump" the version to clear the cached elements related to Splunk Web in client browsers, allowing new static content to load.
+
+To do this, simply navigate to the following URL:
+http://<host>:<mport>/<locale_string>/_bump.
 
 ## General Configuration
 
