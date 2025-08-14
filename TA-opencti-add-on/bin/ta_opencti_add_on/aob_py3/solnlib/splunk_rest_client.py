@@ -1,5 +1,5 @@
 #
-# Copyright 2024 Splunk Inc.
+# Copyright 2025 Splunk Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -23,16 +23,20 @@ calling splunklib SDK directly in business logic code.
 
 import logging
 import os
+import sys
 import traceback
+import solnlib
+
 from io import BytesIO
 from urllib.parse import quote
-
+from urllib3.util.retry import Retry
 from splunklib import binding, client
 
 from .net_utils import validate_scheme_host_port
 from .splunkenv import get_splunkd_access_info
 
 __all__ = ["SplunkRestClient"]
+MAX_REQUEST_RETRIES = 5
 
 
 def _get_proxy_info(context):
@@ -88,17 +92,28 @@ def _request_handler(context):
     verify = context.get("verify", False)
 
     if context.get("key_file") and context.get("cert_file"):
-        # cert = ('/path/client.cert', '/path/client.key')
-        cert = context["key_file"], context["cert_file"]
+        # cert: if tuple, ('cert', 'key') pair as per requests library
+        cert = context["cert_file"], context["key_file"]
     elif context.get("cert_file"):
         cert = context["cert_file"]
+    elif context.get("cert"):
+        # as the solnlib uses requests, we need to have a check for 'cert' key as well
+        cert = context["cert"]
     else:
         cert = None
 
+    retries = Retry(
+        total=MAX_REQUEST_RETRIES,
+        backoff_factor=0.3,
+        status_forcelist=[500, 502, 503, 504],
+        allowed_methods=["GET", "POST", "PUT", "DELETE"],
+        raise_on_status=False,
+    )
     if context.get("pool_connections", 0):
         logging.info("Use HTTP connection pooling")
         session = requests.Session()
         adapter = requests.adapters.HTTPAdapter(
+            max_retries=retries,
             pool_connections=context.get("pool_connections", 10),
             pool_maxsize=context.get("pool_maxsize", 10),
         )
@@ -121,7 +136,7 @@ def _request_handler(context):
 
         body = message.get("body")
         headers = {
-            "User-Agent": "curl",
+            "User-Agent": f"solnlib/{solnlib.__version__} rest-client {sys.platform}",
             "Accept": "*/*",
             "Connection": "Keep-Alive",
         }
@@ -206,7 +221,7 @@ class SplunkRestClient(client.Service):
         """
         # Only do splunkd URI discovery in SPLUNK env (SPLUNK_HOME is set).
         if not all([scheme, host, port]) and os.environ.get("SPLUNK_HOME"):
-            scheme, host, port = get_splunkd_access_info()
+            scheme, host, port = get_splunkd_access_info(session_key)
         if os.environ.get("SPLUNK_HOME") is None:
             if not all([scheme, host, port]):
                 raise ValueError(

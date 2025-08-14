@@ -1,11 +1,11 @@
 #
-# Copyright 2021 Splunk Inc.
+# Copyright 2025 Splunk Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
-# http://www.apache.org/licenses/LICENSE-2.0
+#     http://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
@@ -41,11 +41,11 @@ class RestField:
         self.validator = validator
         self.converter = converter
 
-    def validate(self, data, existing=None):
+    def validate(self, data, existing=None, validate_name=None):
         # update case: check required field in data
         if existing and self.name in data and not data.get(self.name) and self.required:
             raise RestError(400, "Required field is missing: %s" % self.name)
-        value = data.get(self.name)
+        value = data.get(self.name) if not validate_name else validate_name
         if not value and existing is None:
             if self.required:
                 raise RestError(400, "Required field is missing: %s" % self.name)

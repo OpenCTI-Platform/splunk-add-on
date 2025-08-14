@@ -1,4 +1,4 @@
-#!C:\Users\RomainGuignard\AppData\Local\Programs\Python\Python37\python.exe
+#!/Users/jasonmaurath/repo/.venv/bin/python
 __author__ = 'jszheng'
 import optparse
 import sys

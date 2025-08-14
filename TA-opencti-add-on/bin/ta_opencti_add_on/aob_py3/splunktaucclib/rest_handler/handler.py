@@ -1,11 +1,11 @@
 #
-# Copyright 2021 Splunk Inc.
+# Copyright 2025 Splunk Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
-# http://www.apache.org/licenses/LICENSE-2.0
+#     http://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
@@ -22,9 +22,13 @@ REST Handler.
 import json
 import traceback
 import urllib.parse
+from typing import Optional, Any
+
+from defusedxml import ElementTree
 from functools import wraps
 
 from solnlib.splunk_rest_client import SplunkRestClient
+from solnlib.utils import is_true
 from splunklib import binding
 
 from .credentials import RestCredentials
@@ -33,12 +37,39 @@ from .error import RestError
 
 __all__ = ["RestHandler"]
 
+BASIC_NAME_VALIDATORS = {
+    "PROHIBITED_NAME_CHARACTERS": ["*", "\\", "[", "]", "(", ")", "?", ":"],
+    "PROHIBITED_NAMES": ["default", ".", ".."],
+    "MAX_LENGTH": 1024,
+}
+
+_TA_CONFIG_FILENAME = "_TA_config"
+_TA_CONFIG_ENDPOINT = f"configs/conf-{_TA_CONFIG_FILENAME}"
+_NEED_RELOAD_PARAMETER = "need_reload"
+
 
 def _check_name_for_create(name):
     if name == "default":
         raise RestError(400, '"%s" is not allowed for entity name' % name)
     if name.startswith("_"):
         raise RestError(400, 'Name starting with "_" is not allowed for entity')
+
+
+def _parse_error_msg(exc: binding.HTTPError) -> str:
+    permission_msg = "do not have permission to perform this operation"
+    try:
+        msgs = json.loads(exc.body)["messages"]
+        text = msgs[0]["text"]
+    except json.JSONDecodeError:
+        try:
+            text = ElementTree.fromstring(exc.body).findtext("./messages/msg")
+        except ElementTree.ParseError:
+            return exc.body.decode()
+    except (KeyError, IndexError):
+        return exc.body.decode()
+    if exc.status == 403 and permission_msg in text:
+        return "This operation is forbidden."
+    return text
 
 
 def _pre_request(existing):
@@ -84,6 +115,29 @@ def _pre_request(existing):
             else:
                 return None
 
+        def basic_name_validation(name: str):
+            tmp_name = str(name)
+            prohibited_chars = BASIC_NAME_VALIDATORS["PROHIBITED_NAME_CHARACTERS"]
+            prohibited_names = BASIC_NAME_VALIDATORS["PROHIBITED_NAMES"]
+            max_chars = BASIC_NAME_VALIDATORS["MAX_LENGTH"]
+            val_err_msg = (
+                f'{prohibited_names}, string started with "_" and string including any one '
+                f'of {prohibited_chars} are reserved value which cannot be used for field Name"'
+            )
+
+            if tmp_name.startswith("_") or any(
+                tmp_name == el for el in prohibited_names
+            ):
+                raise RestError(400, val_err_msg)
+
+            if any(pc in prohibited_chars for pc in tmp_name):
+                raise RestError(400, val_err_msg)
+
+            if len(tmp_name) >= max_chars:
+                raise RestError(
+                    400, f"Field Name must be less than {max_chars} characters"
+                )
+
         @wraps(meth)
         def wrapper(self, name, data):
             self._endpoint.validate(
@@ -91,6 +145,8 @@ def _pre_request(existing):
                 data,
                 check_existing(self, name),
             )
+            basic_name_validation(name)
+            self._endpoint.validate_special(name, data)
             self._endpoint.encode(name, data)
 
             return meth(self, name, data)
@@ -126,7 +182,7 @@ def _decode_response(meth):
         except RestError:
             raise
         except binding.HTTPError as exc:
-            raise RestError(exc.status, str(exc))
+            raise RestError(exc.status, _parse_error_msg(exc))
         except Exception:
             raise RestError(500, traceback.format_exc())
 
@@ -140,6 +196,7 @@ class RestHandler:
         self._endpoint = endpoint
         self._args = args
         self._kwargs = kwargs
+        self._conf_name = getattr(endpoint, "conf_name", None)
 
         splunkd_info = urllib.parse.urlparse(self._splunkd_uri)
         self._client = SplunkRestClient(
@@ -158,8 +215,7 @@ class RestHandler:
 
     @_decode_response
     def get(self, name, decrypt=False):
-        if self._endpoint.need_reload:
-            self.reload()
+        self.reload_if_needed()
         response = self._client.get(
             self.path_segment(
                 self._endpoint.internal_endpoint,
@@ -171,12 +227,11 @@ class RestHandler:
 
     @_decode_response
     def all(self, decrypt=False, **query):
-        if self._endpoint.need_reload:
-            self.reload()
+        self.reload_if_needed()
         response = self._client.get(
             self.path_segment(self._endpoint.internal_endpoint),
             output_mode="json",
-            **query
+            **query,
         )
         return self._format_all_response(response, decrypt)
 
@@ -251,6 +306,43 @@ class RestHandler:
             output_mode="json",
         )
         return self._flay_response(response)
+
+    def reload_if_needed(self):
+        if self._conf_name and self.is_reload_needed():
+            self.reload()
+
+    def is_reload_needed(self) -> bool:
+        need_reload = self._is_reload_needed()
+
+        if need_reload is None:
+            need_reload = self._endpoint.need_reload
+
+        return need_reload
+
+    def _is_reload_needed(self) -> Optional[bool]:
+        name = "config"
+        try:
+            response = self._client.get(
+                self.path_segment(
+                    _TA_CONFIG_ENDPOINT,
+                    name=name,
+                ),
+                output_mode="json",
+            )
+        except binding.HTTPError:
+            return None
+
+        response = json.loads(response.body.read())
+
+        if "entry" in response:
+            for entry in response["entry"]:
+                if entry["name"] == name and _NEED_RELOAD_PARAMETER in entry["content"]:
+                    need_reload = is_true(entry["content"][_NEED_RELOAD_PARAMETER])
+
+                    if need_reload is not None:
+                        return need_reload
+
+        return None
 
     def reload(self):
         self._client.get(
@@ -364,7 +456,7 @@ class RestHandler:
                     self._endpoint.internal_endpoint,
                     name=name,
                 ),
-                **masked
+                **masked,
             )
 
     def _encrypt_raw_credentials(self, data):

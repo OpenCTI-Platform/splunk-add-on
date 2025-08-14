@@ -1,5 +1,5 @@
 #
-# Copyright 2024 Splunk Inc.
+# Copyright 2025 Splunk Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -16,13 +16,33 @@
 
 """This module contains Splunk server info related functionalities."""
 
+import os
 import json
 from typing import Any, Dict, Optional
 
-from splunklib import binding
+try:
+    from splunk.rest import getWebCertFile, getWebKeyFile
+except (ModuleNotFoundError, ImportError):
 
+    def getWebCertFile():
+        return None
+
+    def getWebKeyFile():
+        return None
+
+
+try:
+    from splunk.rest import is_cert_or_key_encrypted
+except (ModuleNotFoundError, ImportError):
+
+    def is_cert_or_key_encrypted(cert_filename):
+        return False
+
+
+from splunklib import binding
 from solnlib import splunk_rest_client as rest_client
 from solnlib import utils
+from solnlib.splunkenv import get_splunkd_access_info
 
 __all__ = ["ServerInfo", "ServerInfoException"]
 
@@ -56,6 +76,29 @@ class ServerInfo:
             port: The port number, default is None.
             context: Other configurations for Splunk rest client.
         """
+        is_localhost = False
+        if not all([scheme, host, port]) and os.environ.get("SPLUNK_HOME"):
+            scheme, host, port = get_splunkd_access_info(session_key)
+            is_localhost = (
+                host == "localhost" or host == "127.0.0.1" or host in ("::1", "[::1]")
+            )
+
+        web_key_file = getWebKeyFile()
+        web_cert_file = getWebCertFile()
+        if web_cert_file and (
+            web_key_file is None or not is_cert_or_key_encrypted(web_key_file)
+        ):
+            context["cert_file"] = web_cert_file
+
+            if web_key_file is not None:
+                context["key_file"] = web_key_file
+
+            if all([is_localhost, context.get("verify") is None]):
+                # NOTE: this is specifically for mTLS communication
+                # ONLY if scheme, host, port aren't provided AND user hasn't provided server certificate
+                # we set verify to off (similar to 'rest.simpleRequest' implementation)
+                context["verify"] = False
+
         self._rest_client = rest_client.SplunkRestClient(
             session_key, "-", scheme=scheme, host=host, port=port, **context
         )

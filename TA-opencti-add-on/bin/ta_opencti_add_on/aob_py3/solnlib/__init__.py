@@ -1,5 +1,5 @@
 #
-# Copyright 2024 Splunk Inc.
+# Copyright 2025 Splunk Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@
 
 from . import (
     acl,
+    bulletin_rest_client,
     conf_manager,
     credentials,
     file_monitor,
@@ -37,6 +38,7 @@ from . import (
 
 __all__ = [
     "acl",
+    "bulletin_rest_client",
     "conf_manager",
     "credentials",
     "file_monitor",
@@ -54,4 +56,4 @@ __all__ = [
     "utils",
 ]
 
-__version__ = "4.12.0"
+__version__ = "7.0.0"

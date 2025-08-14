@@ -36,7 +36,7 @@ class Scheduler:
         self._wakeup_q = queue.Queue()
         self._lock = threading.Lock()
         self._thr = threading.Thread(target=self._do_jobs)
-        self._thr.deamon = True
+        self._thr.daemon = True
         self._started = False
 
     def start(self):

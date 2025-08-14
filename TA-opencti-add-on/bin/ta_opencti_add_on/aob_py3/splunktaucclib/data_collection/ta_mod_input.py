@@ -1,13 +1,13 @@
 #!/usr/bin/python
 
 #
-# Copyright 2021 Splunk Inc.
+# Copyright 2025 Splunk Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
-# http://www.apache.org/licenses/LICENSE-2.0
+#     http://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
@@ -123,8 +123,6 @@ def run(collector_cls, settings, checkpoint_cls=None, config_cls=None, log_suffi
     """
     Main loop. Run this TA forever
     """
-    # This is for stdout flush
-    utils.disable_stdout_buffer()
 
     # http://bugs.python.org/issue7980
     time.strptime("2016-01-01", "%Y-%m-%d")
@@ -137,11 +135,6 @@ def run(collector_cls, settings, checkpoint_cls=None, config_cls=None, log_suffi
         stulog.logger.debug("No task and exiting...")
         return
     meta_config = tconfig.get_meta_config()
-
-    if tconfig.is_shc_but_not_captain():
-        # In SHC env, only captain is able to collect data
-        stulog.logger.debug("This search header is not captain, will exit.")
-        return
 
     loader = dl.create_data_loader(meta_config)
 

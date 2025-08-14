@@ -1,5 +1,5 @@
 #
-# Copyright 2024 Splunk Inc.
+# Copyright 2025 Splunk Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -23,6 +23,7 @@ import sys
 import threading
 import time
 import traceback
+import warnings
 from abc import ABCMeta, abstractmethod
 from random import randint
 from typing import List, Union
@@ -32,11 +33,21 @@ from splunklib import binding
 from .. import splunk_rest_client as rest_client
 from .. import utils
 from ..hec_config import HECConfig
-from ..splunkenv import get_splunkd_access_info
+from ..splunkenv import get_splunkd_access_info, get_scheme_from_hec_settings
 from ..utils import retry
 from .event import HECEvent, XMLEvent
 
 __all__ = ["ClassicEventWriter", "HECEventWriter"]
+
+
+deprecation_msg = (
+    "Function 'create_from_token' is deprecated and incompatible with 'global_settings_schema=True'. "
+    "Use 'create_from_token_with_session_key' instead."
+)
+
+
+class FunctionDeprecated(Exception):
+    pass
 
 
 class EventWriter(metaclass=ABCMeta):
@@ -203,6 +214,7 @@ class HECEventWriter(EventWriter):
         port: int = None,
         hec_uri: str = None,
         hec_token: str = None,
+        global_settings_schema: bool = True,
         logger: logging.Logger = None,
         **context: dict
     ):
@@ -217,6 +229,7 @@ class HECEventWriter(EventWriter):
             hec_uri: (optional) If hec_uri and hec_token are provided, they will
                 higher precedence than hec_input_name.
             hec_token: (optional) HEC token.
+            global_settings_schema: (optional) if True, scheme will be set based on HEC global settings, default False.
             logger: Logger object.
             context: Other configurations for Splunk rest client.
         """
@@ -227,15 +240,17 @@ class HECEventWriter(EventWriter):
         else:
             self.logger = logging
 
-        if not all([scheme, host, port]):
-            scheme, host, port = get_splunkd_access_info()
-
         if hec_uri and hec_token:
             scheme, host, hec_port = utils.extract_http_scheme_host_port(hec_uri)
         else:
+            if not all([scheme, host, port]):
+                scheme, host, port = get_splunkd_access_info(self._session_key)
             hec_port, hec_token = self._get_hec_config(
                 hec_input_name, session_key, scheme, host, port, **context
             )
+
+        if global_settings_schema:
+            scheme = get_scheme_from_hec_settings(self._session_key)
 
         if not context.get("pool_connections"):
             context["pool_connections"] = 10
@@ -249,7 +264,10 @@ class HECEventWriter(EventWriter):
 
     @staticmethod
     def create_from_token(
-        hec_uri: str, hec_token: str, **context: dict
+        hec_uri: str,
+        hec_token: str,
+        global_settings_schema: bool = False,
+        **context: dict
     ) -> "HECEventWriter":
         """Given HEC URI and HEC token, create HECEventWriter object. This
         function simplifies the standalone mode HECEventWriter usage (not in a
@@ -258,11 +276,17 @@ class HECEventWriter(EventWriter):
         Arguments:
             hec_uri: HTTP Event Collector URI, like https://localhost:8088.
             hec_token: HTTP Event Collector token.
+            global_settings_schema: (optional) if True, scheme will be set based on HEC global settings, default False.
             context: Other configurations.
 
         Returns:
             Created HECEventWriter.
         """
+
+        warnings.warn(deprecation_msg, DeprecationWarning, stacklevel=2)
+
+        if global_settings_schema:
+            raise FunctionDeprecated(deprecation_msg)
 
         return HECEventWriter(
             None,
@@ -272,12 +296,17 @@ class HECEventWriter(EventWriter):
             None,
             hec_uri=hec_uri,
             hec_token=hec_token,
+            global_settings_schema=global_settings_schema,
             **context
         )
 
     @staticmethod
     def create_from_input(
-        hec_input_name: str, splunkd_uri: str, session_key: str, **context: dict
+        hec_input_name: str,
+        splunkd_uri: str,
+        session_key: str,
+        global_settings_schema: bool = False,
+        **context: dict
     ) -> "HECEventWriter":
         """Given HEC input stanza name, splunkd URI and splunkd session key,
         create HECEventWriter object. HEC URI and token etc will be discovered
@@ -289,6 +318,7 @@ class HECEventWriter(EventWriter):
             hec_input_name: Splunk HEC input name.
             splunkd_uri: Splunkd URI, like https://localhost:8089
             session_key: Splunkd access token.
+            global_settings_schema: (optional) if True, scheme will be set based on HEC global settings, default False.
             context: Other configurations.
 
         Returns:
@@ -297,7 +327,13 @@ class HECEventWriter(EventWriter):
 
         scheme, host, port = utils.extract_http_scheme_host_port(splunkd_uri)
         return HECEventWriter(
-            hec_input_name, session_key, scheme, host, port, **context
+            hec_input_name,
+            session_key,
+            scheme,
+            host,
+            port,
+            global_settings_schema=global_settings_schema,
+            **context
         )
 
     @staticmethod
@@ -306,6 +342,7 @@ class HECEventWriter(EventWriter):
         session_key: str,
         hec_uri: str,
         hec_token: str,
+        global_settings_schema: bool = False,
         **context: dict
     ) -> "HECEventWriter":
         """Given Splunkd URI, Splunkd session key, HEC URI and HEC token,
@@ -318,6 +355,7 @@ class HECEventWriter(EventWriter):
             session_key: Splunkd access token.
             hec_uri: Http Event Collector URI, like https://localhost:8088.
             hec_token: Http Event Collector token.
+            global_settings_schema: (optional) if True, scheme will be set based on HEC global settings, default False.
             context: Other configurations.
 
         Returns:
@@ -333,6 +371,7 @@ class HECEventWriter(EventWriter):
             port,
             hec_uri=hec_uri,
             hec_token=hec_token,
+            global_settings_schema=global_settings_schema,
             **context
         )
 
