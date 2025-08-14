@@ -16,13 +16,7 @@ from .. import DatumInContext, This
 
 
 SUB = re.compile(r"sub\(/(.*)/,\s+(.*)\)")
-# Regex generated using the EZRegex package (ezregex.org)
-# EZRegex code: 
-# param1 = group(optional(either("'", '"')), name='quote') + group(chunk) + earlier_group('quote')
-# param2 = group(either(optional('-') + number, '*'))
-# param3 = group(optional('-') + number)
-# pattern = 'split' + ow + '(' + ow + param1 + ow + ',' + ow + param2 + ow + ',' + ow + param3 + ow + ')'
-SPLIT = re.compile(r"split(?:\s+)?\((?:\s+)?(?P<quote>(?:(?:'|\"))?)(.+)(?P=quote)(?:\s+)?,(?:\s+)?((?:(?:\-)?\d+|\*))(?:\s+)?,(?:\s+)?((?:\-)?\d+)(?:\s+)?\)")
+SPLIT = re.compile(r"split\((.),\s+(\d+),\s+(\d+|-1)\)")
 STR = re.compile(r"str\(\)")
 
 
@@ -66,29 +60,23 @@ class Sub(This):
 class Split(This):
     """String splitter
 
-    Concrete syntax is '`split(chars, segment, max_split)`'
-    `chars` can optionally be surrounded by quotes, to specify things like commas or spaces
-    `segment` can be `*` to select all
-    `max_split` can be negative, to indicate no limit
+    Concrete syntax is '`split(char, segment, max_split)`'
     """
 
     def __init__(self, method=None):
         m = SPLIT.match(method)
         if m is None:
             raise DefintionInvalid("%s is not valid" % method)
-        self.chars = m.group(2)
-        self.segment = m.group(3)
-        self.max_split = int(m.group(4))
+        self.char = m.group(1)
+        self.segment = int(m.group(2))
+        self.max_split = int(m.group(3))
         self.method = method
 
     def find(self, datum):
         datum = DatumInContext.wrap(datum)
         try:
-            if self.segment == '*':
-                value = datum.value.split(self.chars, self.max_split)
-            else:
-                value = datum.value.split(self.chars, self.max_split)[int(self.segment)]
-        except:
+            value = datum.value.split(self.char, self.max_split)[self.segment]
+        except Exception:
             return []
         return [DatumInContext.wrap(value)]
 

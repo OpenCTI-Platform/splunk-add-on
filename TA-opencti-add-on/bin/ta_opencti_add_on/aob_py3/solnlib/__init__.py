@@ -18,7 +18,6 @@
 
 from . import (
     acl,
-    bulletin_rest_client,
     conf_manager,
     credentials,
     file_monitor,
@@ -38,7 +37,6 @@ from . import (
 
 __all__ = [
     "acl",
-    "bulletin_rest_client",
     "conf_manager",
     "credentials",
     "file_monitor",
@@ -56,4 +54,4 @@ __all__ = [
     "utils",
 ]
 
-__version__ = "6.0.1"
+__version__ = "4.12.0"

@@ -48,10 +48,7 @@ class JsonPathLexer:
 
     literals = ['*', '.', '[', ']', '(', ')', '$', ',', ':', '|', '&', '~']
 
-    reserved_words = {
-        'where': 'WHERE',
-        'wherenot': 'WHERENOT',
-    }
+    reserved_words = { 'where': 'WHERE' }
 
     tokens = ['DOUBLEDOT', 'NUMBER', 'ID', 'NAMED_OPERATOR'] + list(reserved_words.values())
 
