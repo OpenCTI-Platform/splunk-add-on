@@ -18,10 +18,10 @@ The app is installed
 
 ### Installing from file
 
-1. Download latest version of the Splunk App: [TA-opencti-add-on-1.1.5.tgz](https://github.com/OpenCTI-Platform/splunk-add-on/releases/download/1.1.5/TA-opencti-add-on-1.1.5.tgz)
+1. Download latest version of the Splunk App: [TA-opencti-add-on-1.1.6.spl](https://github.com/OpenCTI-Platform/splunk-add-on/releases/download/1.1.6/TA-opencti-add-on-1.1.6.spl)
 2. Log in to the Splunk Web UI and navigate to "Apps" and click on "Manage Apps"
 3. Click "Install app from file"
-4. Choose file and select the "TA-opencti-add-on-1.1.5.tgz" file
+4. Choose file and select the "TA-opencti-add-on-1.1.6.spl" file
 5. Click on Upload
 The app is installed
 
@@ -80,7 +80,7 @@ Proceed as follows to enable the ingestion of indicators:
 
 ![](./.github/img/config_input.png "Indicators Input Configuration")
 
-5. Validate the newly created Input and ensure it's set to enabled.
+5. Validate the newly created Input and ensure it's set to "Enabled".
 
 As soon as the input is created, the ingestion of indicators begins.
 You can monitor the import of these indicators using the following Splunk query that list all indicators ingested in the kvstore: 
