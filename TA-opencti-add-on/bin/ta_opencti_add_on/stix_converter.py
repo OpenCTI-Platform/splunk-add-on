@@ -3,8 +3,9 @@ from datetime import datetime
 
 from stix_constants import CustomObservableUserAgent, CustomObservableText, CustomObjectCaseIncident
 from utils import get_hash_type, is_ipv6, is_ipv4
-from utils import generate_incident_id, generate_identity_id, generate_relation_id, generate_case_incident_id
+from utils import generate_incident_id, generate_identity_id, generate_relation_id, generate_case_incident_id, generate_sighting_id
 
+FAKE_INDICATOR_ID = "indicator--51b92778-cef0-4a90-b7ec-ebd620d01ac8"
 
 def _get_stix_marking_id(value):
     if value == "tlp_clear":
@@ -15,6 +16,7 @@ def _get_stix_marking_id(value):
         return stix2.TLP_AMBER
     if value == "tlp_red":
         return stix2.TLP_RED
+
 
 
 def _extract_observables_from_cim_model(event, marking, creator):
@@ -103,6 +105,12 @@ def _extract_observables_from_key_model(event, marking, creator):
 
 
 def _convert_observables_to_stix(observables, marking, creator):
+    """
+    :param observables:
+    :param marking:
+    :param creator:
+    :return:
+    """
     stix_observables = []
     customer_properties = {
         "created_by_ref": creator["id"]
@@ -389,6 +397,92 @@ def convert_to_incident(alert_params, event):
             target_ref=stix_incident.id,
             created_by_ref=stix_author.id)
         bundle_objects.append(stix_relation_account)
+
+    bundle = stix2.Bundle(objects=bundle_objects, allow_custom=True)
+    return bundle.serialize()
+
+def convert_to_sighting(alert_params, event):
+    """
+    :param alert_params:
+    :param event:
+    :return:
+    """
+    bundle_objects = []
+
+    # event date
+    event_date = datetime.utcfromtimestamp(float(event.get("_time")))
+
+    # manage marking
+    marking = alert_params.get("tlp")
+    marking_id = _get_stix_marking_id(marking)
+
+    # manage author
+    stix_author = stix2.Identity(
+        id=generate_identity_id(event.get("host", "Splunk"), "system"),
+        name=event.get("host", "Splunk"),
+        identity_class="system"
+    )
+    bundle_objects.append(stix_author)
+
+    sighting_of_value=alert_params.get("sighting_of_value")
+    sighting_of_type=alert_params.get("sighting_of_type")
+    where_sighted_value=alert_params.get("where_sighted_value")
+    where_sighted_type=alert_params.get("where_sighted_type")
+
+    if where_sighted_type.lower() == "organization":
+        where_sighted = stix2.Identity(
+            id=generate_identity_id(str(where_sighted_value), "organization"),
+            name=str(where_sighted_value),
+            identity_class="organization"
+        )
+    elif where_sighted_type.lower() == "system":
+        where_sighted = stix2.Identity(
+            id=generate_identity_id(str(where_sighted_value), "system"),
+            name=str(where_sighted_value),
+            identity_class="system"
+        )
+    else:
+        raise Exception(f"Invalid where_sighted_type: {where_sighted_type}")
+
+    bundle_objects.append(where_sighted)
+
+    # sighting_of conversion
+    if "_observable" in sighting_of_type:
+        obs = {
+            "type": sighting_of_type.split("_observable")[0],
+            "value": sighting_of_value
+        }
+
+        stix_observables = _convert_observables_to_stix(
+            observables=[obs],
+            marking=marking_id,
+            creator=stix_author
+        )
+        stix_observable = stix_observables[0]
+        bundle_objects.append(stix_observable)
+
+        sighting = stix2.Sighting(
+            id=generate_sighting_id(
+                stix_observable["id"],
+                where_sighted["id"],
+                #event_date,
+                #event_date,
+            ),
+            created_by_ref=stix_author.id,
+            description=None,
+            sighting_of_ref=FAKE_INDICATOR_ID,
+            first_seen=event_date,
+            last_seen=event_date,
+            where_sighted_refs=[where_sighted],
+            count=1,
+            object_marking_refs=[marking_id],
+            labels=alert_params.get("labels"),
+            custom_properties={
+                "x_opencti_sighting_of_ref": stix_observable["id"],
+            },
+        )
+
+        bundle_objects.append(sighting)
 
     bundle = stix2.Bundle(objects=bundle_objects, allow_custom=True)
     return bundle.serialize()

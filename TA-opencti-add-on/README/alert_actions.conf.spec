@@ -22,3 +22,11 @@ param.labels = <string> Labels.
 param.tlp = <list> TLP.  It's default value is tlp_amber.
 param.observables_extraction = <list> Observables extraction. It's default value is disable.
 
+[opencti_create_sighting]
+python.version = python3
+param.sighting_of_value = <string> Sighting Of (value). It's a required parameter.
+param.sighting_of_type = <string> Sighting Of (type). It's a required parameter.
+param.where_sighted_value = <string> Where Sighted (value). It's default value is Splunk.
+param.where_sighted_type = <string> Where Sighted (type). It's default value is System.
+param.labels = <string> Labels.
+param.tlp = <list> TLP.  It's default value is tlp_amber.
