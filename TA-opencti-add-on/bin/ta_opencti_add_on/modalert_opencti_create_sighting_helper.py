@@ -1,13 +1,11 @@
 # encoding = utf-8
 import json
-from datetime import datetime
-
 from app_connector_helper import SplunkAppConnectorHelper
-from stix_converter import convert_to_incident_response
+from stix_converter import convert_to_sighting
 from constants import CONNECTOR_NAME, CONNECTOR_ID
 
 
-def create_incident_response(helper, event):
+def create_sighting(helper, event):
     """
     :param helper:
     :param event:
@@ -20,22 +18,31 @@ def create_incident_response(helper, event):
     # remove potential empty labels
     labels = list(filter(None, labels))
 
+    helper.log_info(helper.get_param("sighting_of_value"))
+    helper.log_info(type(helper.get_param("sighting_of_value")))
+    helper.log_info(helper.get_param("sighting_of_type"))
+    helper.log_info(type(helper.get_param("sighting_of_type")))
+    helper.log_info(helper.get_param("where_sighted_value"))
+    helper.log_info(type(helper.get_param("where_sighted_value")))
+    helper.log_info(helper.get_param("where_sighted_type"))
+    helper.log_info(type(helper.get_param("where_sighted_type")))
+    helper.log_info(labels)
+    helper.log_info(helper.get_param("tlp"))
+
     params = {
-        "name": helper.get_param("name"),
-        "description": helper.get_param("description"),
-        "type": helper.get_param("type"),
-        "severity": helper.get_param("severity"),
-        "priority": helper.get_param("priority"),
+        "sighting_of_value": helper.get_param("sighting_of_value"),
+        "sighting_of_type": helper.get_param("sighting_of_type"),
+        "where_sighted_value": helper.get_param("where_sighted_value"),
+        "where_sighted_type": helper.get_param("where_sighted_type"),
         "labels": labels,
         "tlp": helper.get_param("tlp"),
-        "observables_extraction": helper.get_param("observables_extraction")
     }
-    helper.log_debug("Alert params={}".format(params))
+
+    helper.log_info(f"Alert params={params}")
 
     opencti_url = helper.get_global_setting("opencti_url")
     opencti_api_key = helper.get_global_setting("opencti_api_key")
 
-    # init splunk connector helper
     splunk_app_connector = SplunkAppConnectorHelper(
         connector_id=CONNECTOR_ID,
         connector_name=CONNECTOR_NAME,
@@ -45,7 +52,7 @@ def create_incident_response(helper, event):
     )
 
     # convert to_stix
-    bundle = convert_to_incident_response(
+    bundle = convert_to_sighting(
         alert_params=params,
         event=event
     )
@@ -81,29 +88,14 @@ def process_event(helper, *args, **kwargs):
     [sample_code_macro:start]
 
     # The following example gets the alert action parameters and prints them to the log
-    name = helper.get_param("name")
-    helper.log_info("name={}".format(name))
-
-    description = helper.get_param("description")
-    helper.log_info("description={}".format(description))
-
-    severity = helper.get_param("severity")
-    helper.log_info("severity={}".format(severity))
-
-    priority = helper.get_param("priority")
-    helper.log_info("priority={}".format(priority))
-
-    type = helper.get_param("type")
-    helper.log_info("type={}".format(type))
-
-    case_template = helper.get_param("case_template")
-    helper.log_info("case_template={}".format(case_template))
-
     labels = helper.get_param("labels")
     helper.log_info("labels={}".format(labels))
 
     tlp = helper.get_param("tlp")
     helper.log_info("tlp={}".format(tlp))
+
+    observables_extraction = helper.get_param("observables_extraction")
+    helper.log_info("observables_extraction={}".format(observables_extraction))
 
 
     # The following example adds two sample events ("hello", "world")
@@ -128,11 +120,11 @@ def process_event(helper, *args, **kwargs):
     # Set the current LOG level
     helper.set_log_level(helper.log_level)
 
-    helper.log_info("Alert action create_incident_response started.")
+    helper.log_info("Alert action create_sighting started.")
 
     events = helper.get_events()
     for event in events:
         helper.log_debug("event={}".format(json.dumps(event)))
-        create_incident_response(helper, event)
+        create_sighting(helper, event)
 
     return 0

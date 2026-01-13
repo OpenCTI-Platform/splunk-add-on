@@ -7,7 +7,7 @@ import os
 import sys
 
 from alert_actions_base import ModularAlertBase
-import modalert_create_sighting_helper
+import modalert_opencti_create_sighting_helper
 
 class AlertActionWorkercreate_sighting(ModularAlertBase):
 
@@ -16,9 +16,12 @@ class AlertActionWorkercreate_sighting(ModularAlertBase):
 
     def validate_params(self):
 
-        if not self.get_param("observables_extraction"):
-            self.log_error('observables_extraction is a mandatory parameter, but its value is None.')
+        """
+        if not self.get_param("sighting_of"):
+            self.log_error('sighting_of is a mandatory parameter, but its value is None.')
             return False
+        """
+
         return True
 
     def process_event(self, *args, **kwargs):
@@ -26,7 +29,7 @@ class AlertActionWorkercreate_sighting(ModularAlertBase):
         try:
             if not self.validate_params():
                 return 3
-            status = modalert_create_sighting_helper.process_event(self, *args, **kwargs)
+            status = modalert_opencti_create_sighting_helper.process_event(self, *args, **kwargs)
         except (AttributeError, TypeError) as ae:
             self.log_error("Error: {}. Please double check spelling and also verify that a compatible version of Splunk_SA_CIM is installed.".format(str(ae)))
             return 4
@@ -41,5 +44,5 @@ class AlertActionWorkercreate_sighting(ModularAlertBase):
         return status
 
 if __name__ == "__main__":
-    exitcode = AlertActionWorkercreate_sighting("TA-opencti-add-on", "create_sighting").run(sys.argv)
+    exitcode = AlertActionWorkercreate_sighting("TA-opencti-add-on", "opencti_create_sighting").run(sys.argv)
     sys.exit(exitcode)
