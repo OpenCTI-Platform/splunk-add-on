@@ -18,10 +18,10 @@ The app is installed
 
 ### Installing from file
 
-1. Download latest version of the Splunk App: [TA-opencti-add-on-1.1.6.spl](https://github.com/OpenCTI-Platform/splunk-add-on/releases/download/1.1.6/TA-opencti-add-on-1.1.6.spl)
+1. Download latest version of the Splunk App: [TA-opencti-add-on-1.1.7.tar.gz](https://github.com/OpenCTI-Platform/splunk-add-on/releases/download/1.1.7/TA-opencti-add-on-1.1.7.tar.gz)
 2. Log in to the Splunk Web UI and navigate to "Apps" and click on "Manage Apps"
 3. Click "Install app from file"
-4. Choose file and select the "TA-opencti-add-on-1.1.6.spl" file
+4. Choose file and select the "TA-opencti-add-on-1.1.7.tar.gz" file
 5. Click on Upload
 The app is installed
 
@@ -99,24 +99,24 @@ The ingestion process can also be monitored by consulting the log file ```ta_ope
 
 ## OpenCTI custom alert actions
 
-You can use the "OpenCTI Add-on for Splunk" to create custom alert actions that automatically create incidents or incidents response case in response to alert trigger by Splunk.
+You can use the "OpenCTI Add-on for Splunk" to create custom alert actions that automatically create 'incidents' or/and 'incident response cases' or/and 'sighting' in response to alert trigger by Splunk.
 
-### Create an incident or an incident response case in OpenCTI
+### Create an incident or/and an incident response case or/and a sighting in OpenCTI
 
 You can create an incident or an incident response case in OpenCTI from a custom alert action.
 1. Write a Splunk search query.
 2. Click Save As > Alert.
 3. Fill out the Splunk Alert form. Give your alert a unique name and indicate whether the alert is a real-time alert or a scheduled alert.
 4. Under Trigger Actions, click Add Actions.
-5. From the list, select "OpenCTI - Create Incident" if you want the alert to create an incident in OpenCTI or "OpenCTI - Create Incident Response" if you want to create an incident response case in OpenCTI.
+5. From the list, select "OpenCTI - Create Incident" if you want the alert to create an incident in OpenCTI or "OpenCTI - Create Incident Response" if you want to create an incident response case in OpenCTI or "OpenCTI - Create Sighting" if you want to create a sighting in OpenCTI.
 
 ![](./.github/img/alert_actions.png "Custom Alert Actions")
 
-6. Complete the form with the following settings:
+6. To create and incident or an incident response case, complete the form with the following settings:
 
 | Parameter                | Description                                           | Scope                             |
 |--------------------------|-------------------------------------------------------|-----------------------------------|
-| `Name`                   | Name of the incident or incident response case        | Incident & Incident response case |
+| `Name`                   | Name of the incident                                  | Incident & Incident response case |
 | `Description`            | Description of the incident or incident response case | Incident & Incident response case |                              
 | `Type`                   | Incident Type or incident response case type          | Incident & Incident response case |                              
 | `Severity`               | Severity of the incident or incident response case    | Incident & Incident response case | 
@@ -125,8 +125,18 @@ You can create an incident or an incident response case in OpenCTI from a custom
 | `TLP`                    | Markings to be applied                                | Incident & Incident response case | 
 | `Observables extraction` | Method for extracting observables                     | Incident & Incident response case | 
 
+7. To create a sighting, complete the form with the following settings:
 
-You can also use [Splunk "tokens"](https://docs.splunk.com/Documentation/Splunk/9.2.2/Alert/EmailNotificationTokens#Result_tokens) as variables in the form to contextualize the data imported into OpenCTI.
+| Parameter                | Description                                                   | Scope      |
+|--------------------------|---------------------------------------------------------------|------------|
+| `Sighting Of (value)`    | Value of what was sighted                                     | Sighting   |
+| `Sighting Of (type)`     | Type of what was sighted (URL, Domain, IPV4, IPV6)            | Sighting   |                              
+| `Where Sighted (value)`  | Value of the 'System' or 'Organization' that saw the sighting | Sighting   |                              
+| `Where Sighted (type)`   | 'System' or 'Organization' that saw the sighting              | Sighting   | 
+| `Labels`                 | Labels (separated by a comma) to be applied                   | Sighting   | 
+| `TLP`                    | Markings to be applied                                        | Sighting   | 
+
+You can use [Splunk "tokens"](https://docs.splunk.com/Documentation/Splunk/9.2.2/Alert/EmailNotificationTokens#Result_tokens) as variables in the form to contextualize the data imported into OpenCTI.
 Tokens represent data that a search generates. They work as placeholders or variables for data values that populate when the search completes.
 
 Example of a configuration to create an incident in OpenCTI
