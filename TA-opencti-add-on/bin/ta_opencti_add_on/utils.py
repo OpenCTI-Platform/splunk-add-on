@@ -2,7 +2,6 @@ import datetime
 import ipaddress
 import re
 import uuid
-
 from stix2.canonicalization.Canonicalize import canonicalize
 
 regex_sha512 = r"[0-9a-fA-F]{128}"
@@ -85,7 +84,7 @@ def generate_identity_id(name: str, identity_class: str):
     entity_id = str(uuid.uuid5(uuid.UUID("00abedb4-aa42-466c-9c01-fed23315a9b7"), data))
     return "identity--" + entity_id
 
-def generate_incident_id(name: str, created: str):
+def generate_incident_id(name: str, created):
     """
     :param name:
     :param created:
@@ -141,7 +140,7 @@ def generate_sighting_id(
     entity_id = str(uuid.uuid5(uuid.UUID("00abedb4-aa42-466c-9c01-fed23315a9b7"), data))
     return "sighting--" + entity_id
 
-def generate_case_incident_id(name: str, created: str):
+def generate_case_incident_id(name: str, created):
     """
     :param name:
     :param created:

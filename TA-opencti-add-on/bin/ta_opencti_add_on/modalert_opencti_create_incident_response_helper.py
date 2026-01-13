@@ -28,7 +28,6 @@ def create_incident_response(helper, event):
         "priority": helper.get_param("priority"),
         "labels": labels,
         "tlp": helper.get_param("tlp"),
-        "date": datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ"),
         "observables_extraction": helper.get_param("observables_extraction")
     }
     helper.log_debug("Alert params={}".format(params))
