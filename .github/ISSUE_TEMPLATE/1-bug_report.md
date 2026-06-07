@@ -1,7 +1,7 @@
 ---
 name: Bug report
 about: Create a bug report to help us improve the OpenCTI Splunk add-on
-title: 'fix: '
+title: 'fix(scope): '
 labels: needs triage, bug
 assignees: ''
 type: bug
