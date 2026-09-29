@@ -1,4 +1,5 @@
 import datetime
+import hashlib
 import ipaddress
 import re
 import uuid
@@ -198,3 +199,84 @@ def generate_relation_id(
     data = canonicalize(data, utf8=False)
     entity_id = str(uuid.uuid5(uuid.UUID("00abedb4-aa42-466c-9c01-fed23315a9b7"), data))
     return "relationship--" + entity_id
+
+
+# Result fields that differ between runs of the same search even when the
+# underlying event is identical. They must not feed the event identity key.
+#   rid            row index injected by pre_handle() (0 for per-result alerts)
+#   info_*         added by `addinfo` (search window, search time, sid)
+#   search_now     scheduler dispatch time
+#   orig_sid/rid   ES notable / summary-index provenance
+def event_identity_key(event):
+    """
+    Build a key that identifies the underlying Splunk event, independent of the
+    search run that returned it (#44).
+
+    Scheduled searches with overlapping windows (e.g. every 5m over the last
+    15m) return the same event in several runs, each with a different sid and
+    row position. The key must be the same in every run so the resulting
+    incident keeps being upserted instead of duplicated.
+
+    Resolution order:
+      1. _bkt (or index + splunk_server) + _cd  Splunk's address of an indexed event
+      2. _raw                         raw event text when _cd was dropped
+
+    Rows from transforming searches (stats, table, ...) carry neither, and are
+    deliberately not keyed: their field values (counts, etc.) can change between
+    overlapping runs, so any content hash would give the same logical row a new
+    ID each run. They keep the legacy name + _time behaviour (upsert across
+    runs; same-second collisions remain possible for them).
+
+    :param event: the current result dict
+    :return: str key ("" for rows without _cd/_raw)
+    """
+    cd = event.get("_cd")
+    if cd:
+        # _bkt ("index~id~origin_guid") is stable across cluster peers; fall back
+        # to index + splunk_server when the search did not keep it
+        bkt = event.get("_bkt")
+        if bkt:
+            return "cd|{}|{}".format(bkt, cd)
+        return "cd|{}|{}|{}".format(event.get("index", ""), event.get("splunk_server", ""), cd)
+    raw = event.get("_raw")
+    if raw:
+        return "raw|{}".format(raw)
+    return ""
+
+
+def disambiguate_created(event_date, event):
+    """
+    Add a deterministic sub-second offset to an event date when Splunk's _time
+    only has whole-second resolution (#44).
+
+    Incident and Case-Incident IDs are derived from name + created, so distinct
+    alert results firing in the same second would otherwise collapse onto one
+    OpenCTI entity. The offset (1-999 ms) is derived from event_identity_key(),
+    so the same event yields the same timestamp - and the same ID - on retries
+    and across overlapping scheduled-search runs, preserving the upsert
+    behaviour. Distinct same-second events land on different offsets with high
+    probability (hash into 999 slots; ~0.1% collision chance for two events).
+    The offset is never 0, so a disambiguated ID never equals the legacy one.
+
+    :param event_date: datetime built from event["_time"]
+    :param event: the current result dict
+    :return: datetime (unchanged when _time is absent, has sub-second
+             precision, or the row has no _cd/_raw - e.g. transforming
+             searches, which keep the legacy created)
+    """
+    raw_time = event.get("_time")
+    if not raw_time:
+        return event_date
+    try:
+        epoch = float(raw_time)
+    except (TypeError, ValueError):
+        return event_date
+    if epoch != int(epoch) or event_date.microsecond != 0:
+        return event_date
+
+    key = event_identity_key(event)
+    if not key:
+        return event_date
+    digest = int(hashlib.sha256(key.encode("utf-8")).hexdigest(), 16)
+    offset_ms = 1 + digest % 999
+    return event_date + datetime.timedelta(milliseconds=offset_ms)

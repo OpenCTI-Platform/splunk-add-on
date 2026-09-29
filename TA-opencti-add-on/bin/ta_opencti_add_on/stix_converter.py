@@ -2,7 +2,7 @@ import stix2
 from datetime import datetime, timezone
 
 from stix_constants import CustomObservableUserAgent, CustomObservableText, CustomObjectCaseIncident
-from utils import get_hash_type, is_ipv6, is_ipv4
+from utils import get_hash_type, is_ipv6, is_ipv4, disambiguate_created
 from utils import generate_incident_id, generate_identity_id, generate_relation_id, generate_case_incident_id, generate_sighting_id
 
 FAKE_INDICATOR_ID = "indicator--51b92778-cef0-4a90-b7ec-ebd620d01ac8"
@@ -274,6 +274,9 @@ def convert_to_incident_response(alert_params, event):
     else:
         event_date = datetime.now(timezone.utc)
 
+    # created: disambiguated so same-second results don't share an ID (#44)
+    created_date = disambiguate_created(event_date, event)
+
     # manage marking
     marking = alert_params.get("tlp")
     marking_id = _get_stix_marking_id(marking)
@@ -309,13 +312,13 @@ def convert_to_incident_response(alert_params, event):
 
     # create incident response case
     stix_case_incident = CustomObjectCaseIncident(
-        id=generate_case_incident_id(alert_params.get("name"), event_date),
+        id=generate_case_incident_id(alert_params.get("name"), created_date),
         name=alert_params.get("name"),
         description=alert_params.get("description"),
         severity=alert_params.get("severity"),
         priority=alert_params.get("priority"),
         labels=alert_params.get("labels"),
-        created=event_date,
+        created=created_date,
         external_references=[],
         created_by_ref=stix_author.id,
         object_marking_refs=[marking_id],
@@ -340,6 +343,9 @@ def convert_to_incident(alert_params, event):
         event_date = datetime.fromtimestamp(float(event.get("_time")), timezone.utc)
     else:
         event_date = datetime.now(timezone.utc)
+
+    # created: disambiguated so same-second results don't share an ID (#44)
+    created_date = disambiguate_created(event_date, event)
 
     # manage marking
     marking = alert_params.get("tlp", "tlp_clear")
@@ -376,9 +382,9 @@ def convert_to_incident(alert_params, event):
 
     # create incident
     stix_incident = stix2.Incident(
-        id=generate_incident_id(alert_params.get("name"), event_date),
+        id=generate_incident_id(alert_params.get("name"), created_date),
         name=alert_params.get("name"),
-        created=event_date,
+        created=created_date,
         description=alert_params.get("description"),
         object_marking_refs=[marking_id],
         created_by_ref=stix_author.id,
