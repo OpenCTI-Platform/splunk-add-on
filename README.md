@@ -1,5 +1,9 @@
 # OpenCTI Add On for Splunk
 
+> [!WARNING]
+> **This add-on is deprecated and will no longer receive updates.**
+> Please migrate to **OpenCTI for Splunk Enterprise**, available on [Splunkbase](https://splunkbase.splunk.com/app/8431) ([GitHub repository](https://github.com/OpenCTI-Platform/splunk-enterprise-add-on)).
+
 The OpenCTI Add-on for Splunk allows users to interconnect Splunk with OpenCTI platform.
 
 ## Key features
@@ -18,10 +22,10 @@ The app is installed
 
 ### Installing from file
 
-1. Download latest version of the Splunk App: [TA-opencti-add-on-1.1.7.tar.gz](https://github.com/OpenCTI-Platform/splunk-add-on/releases/download/1.1.7/TA-opencti-add-on-1.1.7.tar.gz)
+1. Download latest version of the Splunk App: [TA-opencti-add-on-1.1.8.tar.gz](https://github.com/OpenCTI-Platform/splunk-add-on/releases/download/1.1.8/TA-opencti-add-on-1.1.8.tar.gz)
 2. Log in to the Splunk Web UI and navigate to "Apps" and click on "Manage Apps"
 3. Click "Install app from file"
-4. Choose file and select the "TA-opencti-add-on-1.1.7.tar.gz" file
+4. Choose file and select the "TA-opencti-add-on-1.1.8.tar.gz" file
 5. Click on Upload
 The app is installed
 
